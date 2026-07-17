@@ -69,6 +69,80 @@
     <div class="legend" id="priceLegend"></div>
   </section>
 
+  <section class="panel predictor-panel">
+    <div class="panel-head">
+      <h2>Match Predictor</h2>
+      <p class="panel-sub">Thinking of buying something? Enter its notes and see how it stacks up against what you own.</p>
+    </div>
+    <form id="predictorForm" class="entry-form">
+      <div class="form-row">
+        <label>Name<input type="text" id="pName" placeholder="e.g. Santal 33"></label>
+        <label>Brand<input type="text" id="pBrand" placeholder="e.g. Le Labo"></label>
+      </div>
+      <div class="form-row">
+        <label>Price (IDR)<input type="number" id="pPrice" placeholder="e.g. 3200000"></label>
+        <label>Size (ml)<input type="number" id="pSize" placeholder="e.g. 50"></label>
+      </div>
+      <p class="form-hint">If the brand gives a pyramid, fill Top/Mid/Base. If not, just use General Notes. Either way, comma-separated.</p>
+      <div class="form-row three">
+        <label>Top Notes<input type="text" id="pTop" placeholder="Bergamot, Cardamom"></label>
+        <label>Mid Notes<input type="text" id="pMid" placeholder="Iris, Violet"></label>
+        <label>Base Notes<input type="text" id="pBase" placeholder="Sandalwood, Musk"></label>
+      </div>
+      <label>General Notes (if no pyramid)<input type="text" id="pGeneral" placeholder="Sandalwood, Cedar, Leather, Musk"></label>
+      <button type="submit" class="btn-primary">Analyze Match</button>
+    </form>
+    <div id="predictorResult"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Add a Bottle</h2>
+      <p class="panel-sub">Fill this in for a bottle you actually own — it generates the JSON block to paste into <code>data.json</code> on GitHub.</p>
+    </div>
+    <form id="addForm" class="entry-form">
+      <div class="form-row">
+        <label>Name<input type="text" id="aName" required></label>
+        <label>Brand<input type="text" id="aBrand" required></label>
+      </div>
+      <div class="form-row three">
+        <label>Concentration<input type="text" id="aConc" placeholder="EDP"></label>
+        <label>Size (ml)<input type="number" id="aSize"></label>
+        <label>Price (IDR)<input type="number" id="aPrice"></label>
+      </div>
+      <label>Purchase Date<input type="text" id="aDate" placeholder="DD/MM/YYYY"></label>
+      <div class="form-row three">
+        <label>Top Notes<input type="text" id="aTop"></label>
+        <label>Mid Notes<input type="text" id="aMid"></label>
+        <label>Base Notes<input type="text" id="aBase"></label>
+      </div>
+      <label>General Notes (if no pyramid)<input type="text" id="aGeneral"></label>
+      <div class="form-row">
+        <label>Accord Family<input type="text" id="aAccord" placeholder="Floral/Woody"></label>
+        <label>Season
+          <select id="aSeason">
+            <option value="">—</option>
+            <option>Day/Summer</option><option>Night/Winter</option>
+            <option>Rainy/Fresh</option><option>All-Season</option>
+          </select>
+        </label>
+      </div>
+      <label>Occasion (comma-separated)<input type="text" id="aOccasion" placeholder="Everyday, Office"></label>
+      <div class="form-row three">
+        <label>Rating (1-5)<input type="number" step="0.5" min="1" max="5" id="aRating"></label>
+        <label>Sillage
+          <select id="aSillage"><option value="">—</option><option>Light</option><option>Moderate</option><option>Heavy</option></select>
+        </label>
+        <label>Rebuy?
+          <select id="aRebuy"><option value="">—</option><option>Yes</option><option>Maybe</option><option>No</option></select>
+        </label>
+      </div>
+      <label>Comments<textarea id="aComments" rows="2"></textarea></label>
+      <button type="submit" class="btn-primary">Generate JSON Block</button>
+    </form>
+    <div id="addResult"></div>
+  </section>
+
   <section class="panel">
     <div class="panel-head">
       <h2>Collection</h2>
@@ -76,6 +150,7 @@
     </div>
     <div class="filters">
       <select id="brandFilter"><option value="">All brands</option></select>
+      <select id="yearFilter"><option value="">All years</option></select>
       <select id="seasonFilter"><option value="">All seasons</option></select>
       <select id="occasionFilter"><option value="">All occasions</option></select>
     </div>

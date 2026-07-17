@@ -6,6 +6,7 @@ const REBUY_COLORS = { "Yes": "#7C8B6F", "Maybe": "#C08A3E", "No": "#A85C6B" };
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxpYlA3puA2iQ-rsJavvYbivTx1dO8SgvtqXXE7dGOLMh-Ugvdda3cfR9-dDJwtJSo3-A/exec";
 const WRITE_SECRET = "perfumesecret"; // must match SECRET in apps-script.gs
 
+
 const USING_LIVE_SHEET = SHEET_API_URL && !SHEET_API_URL.startsWith("PASTE_");
 
 function loadData(){
@@ -417,6 +418,10 @@ function setupPredictor(perfumes){
 
 /* ---------- Add a Bottle ---------- */
 function setupAddForm(perfumes){
+  document.getElementById('addFormSub').textContent = USING_LIVE_SHEET
+    ? 'Fill this in for a bottle you actually own — it saves straight to your Google Sheet.'
+    : 'Fill this in for a bottle you actually own — it generates the JSON block to paste into data.json on GitHub.';
+
   document.getElementById('addForm').addEventListener('submit', e => {
     e.preventDefault();
     const val = id => document.getElementById(id).value.trim();

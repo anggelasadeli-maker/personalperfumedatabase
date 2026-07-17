@@ -68,7 +68,7 @@
       "sillage": "Light",
       "wearFrequency": "",
       "rebuy": "No",
-      "comments": "Not the gourmand I expected, not sweet w/ toasted / burnish smell, reminds me a bit of herbal soup. Maybe I need to test it more"
+      "comments": "Not the gourmand I expected, not sweet w/ toasted / burnish smell, reminds me a bit of herbal soup. Maybe I need to test it more. I like the dry down."
     },
     {
       "id": "P003",
@@ -1083,6 +1083,152 @@
       "wearFrequency": "",
       "rebuy": "Maybe",
       "comments": "Used to like it, but now seems a bit boring"
+    },
+    {
+      "id": "P032",
+      "name": "Shigatse Milky Sandalwood",
+      "brand": "Heiseey",
+      "concentration": "EDP",
+      "sizeMl": 30.0,
+      "price": 445000.0,
+      "pricePerMl": 14833.33,
+      "purchaseDate": "15/03/2026",
+      "notes": {
+        "top": [
+          "Caramel",
+          "Coconut",
+          "Clove"
+        ],
+        "mid": [
+          "Sandalwood",
+          "Rice",
+          "Iris"
+        ],
+        "base": [
+          "Vanilla",
+          "Musk",
+          "Patchouli"
+        ],
+        "general": []
+      },
+      "accordFamily": "Gourmand/Woody",
+      "season": "All-Season",
+      "occasion": [],
+      "rating": 5.0,
+      "longevity": null,
+      "sillage": "",
+      "wearFrequency": "",
+      "rebuy": "Yes",
+      "comments": "When I say I want a rice perfume, this is what I meant! Milky, aromatic, I can smell the rice and the spice cooked with it. Comforting"
+    },
+    {
+      "id": "P034",
+      "name": "06:00 AM",
+      "brand": "SW19",
+      "concentration": "EDP",
+      "sizeMl": 50.0,
+      "price": 1200000.0,
+      "pricePerMl": 24000.0,
+      "purchaseDate": "",
+      "notes": {
+        "top": [
+          "Anise",
+          "Bergamot",
+          "Grapefruit"
+        ],
+        "mid": [
+          "Cardamom",
+          "Clary sage",
+          "Basil"
+        ],
+        "base": [
+          "Wormwood",
+          "Cedarwood",
+          "Musk"
+        ],
+        "general": []
+      },
+      "accordFamily": "Aromatic, Fresh, Woody",
+      "season": "All-Season",
+      "occasion": [],
+      "rating": 5.0,
+      "longevity": null,
+      "sillage": "",
+      "wearFrequency": "",
+      "rebuy": "Yes",
+      "comments": "One of my first fresh perfume. Bought in Korea, love it so much I rarely used it. Haha"
+    },
+    {
+      "id": "P035",
+      "name": "Oolong Rocking Green No. P26",
+      "brand": "Chujian",
+      "concentration": "Extrait",
+      "sizeMl": 50.0,
+      "price": 1247500.0,
+      "pricePerMl": 24950.0,
+      "purchaseDate": "22/03/2026",
+      "notes": {
+        "top": [
+          "Bergamot",
+          "Grapefruit",
+          "Pear",
+          "Green accord"
+        ],
+        "mid": [
+          "Jasmine",
+          "Ylang-Ylang",
+          "Orange Blossom",
+          "Rose",
+          "Orchid"
+        ],
+        "base": [
+          "Oolong Tea",
+          "Vetiver",
+          "Moss",
+          "Musk"
+        ],
+        "general": []
+      },
+      "accordFamily": "Tea/Fresh",
+      "season": "Rainy/Fresh",
+      "occasion": [],
+      "rating": 3.5,
+      "longevity": null,
+      "sillage": "",
+      "wearFrequency": "",
+      "rebuy": "No",
+      "comments": "Nothing special really"
+    },
+    {
+      "id": "P036",
+      "name": "Bu Zhi Chun",
+      "brand": "BlackPaw",
+      "concentration": "EDP",
+      "sizeMl": 30.0,
+      "price": 435000.0,
+      "pricePerMl": 14500.0,
+      "purchaseDate": "18/03/2026",
+      "notes": {
+        "top": [
+          "Rhubarb"
+        ],
+        "mid": [
+          "Rock Tea (Yancha/Wuyi Oolong Accord)"
+        ],
+        "base": [
+          "Cashmere Wood"
+        ],
+        "general": []
+      },
+      "accordFamily": "Tea/Aromatic/Woody",
+      "season": "All-Season",
+      "occasion": [],
+      "rating": 5.0,
+      "longevity": null,
+      "sillage": "",
+      "wearFrequency": "",
+      "rebuy": "Maybe",
+      "comments": "Unique tea scent, like when you smell it, you'll be like this is tea brewed too long. Like, Tongji tea left too bitter"
     }
   ]
 }

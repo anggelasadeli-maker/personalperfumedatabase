@@ -1,12 +1,24 @@
 const PALETTE = ["#C08A3E","#6B4059","#7C8B6F","#9C6B26","#B0755F","#5C6B4F","#8C5A73","#4A5C7A","#7A9E7E","#A85C6B"];
 const REBUY_COLORS = { "Yes": "#7C8B6F", "Maybe": "#C08A3E", "No": "#A85C6B" };
 
-fetch('data.json')
-  .then(r => r.json())
+// Paste your Apps Script Web App URL here after deploying (see README).
+// Leave as-is to keep using the static data.json file instead.
+const SHEET_API_URL = "PASTE_YOUR_WEB_APP_URL_HERE";
+const WRITE_SECRET = "CHANGE-THIS-TO-YOUR-OWN-SECRET"; // must match SECRET in apps-script.gs
+
+const USING_LIVE_SHEET = SHEET_API_URL && !SHEET_API_URL.startsWith("PASTE_");
+
+function loadData(){
+  return USING_LIVE_SHEET
+    ? fetch(SHEET_API_URL).then(r => r.json())
+    : fetch('data.json').then(r => r.json());
+}
+
+loadData()
   .then(data => render(data))
   .catch(err => {
     document.getElementById('collectionGrid').innerHTML =
-      `<p style="color:#a33">Couldn't load data.json — if you opened this file directly, run a local server instead (see README). Error: ${err}</p>`;
+      `<p style="color:#a33">Couldn't load data — if you opened this file directly, run a local server instead (see README). Error: ${err}</p>`;
   });
 
 let PERFUMES = [];
@@ -21,10 +33,12 @@ function render(data){
   renderBrandChart(perfumes);
   renderRebuyChart(perfumes);
   renderPriceChart(perfumes);
+  renderGapTable(perfumes);
   populateFilters(perfumes);
   renderGrid(perfumes);
   setupPredictor(perfumes);
   setupAddForm(perfumes);
+  setupCardFlip();
 
   ['brandFilter','yearFilter','seasonFilter','occasionFilter'].forEach(id =>
     document.getElementById(id).addEventListener('change', () => renderGrid(perfumes, currentFilters()))
@@ -173,6 +187,33 @@ function renderPriceChart(perfumes){
   ).join('');
 }
 
+/* ---------- Coverage gaps (Season x Occasion) ---------- */
+function renderGapTable(perfumes){
+  const seasonOrder = ["Day/Summer", "Night/Winter", "Rainy/Fresh", "All-Season"];
+  const seasons = seasonOrder.filter(s => perfumes.some(p => p.season === s));
+  const occasions = [...new Set(perfumes.flatMap(p => p.occasion || []))].sort();
+
+  const el = document.getElementById('gapTable');
+  if (!seasons.length || !occasions.length){
+    el.innerHTML = '<p>Add season/occasion tags to your perfumes to see coverage.</p>';
+    return;
+  }
+
+  let html = '<table><thead><tr><th>Season \\ Occasion</th>' +
+    occasions.map(o => `<th>${o}</th>`).join('') + '</tr></thead><tbody>';
+
+  seasons.forEach(season => {
+    html += `<tr><td>${season}</td>`;
+    occasions.forEach(occ => {
+      const count = perfumes.filter(p => p.season === season && (p.occasion||[]).includes(occ)).length;
+      html += `<td class="${count ? 'filled' : 'zero'}">${count || '–'}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  el.innerHTML = html;
+}
+
 /* ---------- Filters ---------- */
 function purchaseYear(p){
   const d = p.purchaseDate;
@@ -218,25 +259,46 @@ function renderGrid(perfumes, filters = {}){
 
   grid.innerHTML = filtered.map(p => `
     <div class="card">
-      <div class="card-top">
-        <div>
-          <h3>${p.name}</h3>
-          <p class="brand">${p.brand} · ${p.concentration || ''}</p>
+      <div class="card-flip">
+        <div class="card-front">
+          <div class="card-top">
+            <div>
+              <h3>${p.name}</h3>
+              <p class="brand">${p.brand} · ${p.concentration || ''}</p>
+            </div>
+            <span class="rating">${p.rating != null ? p.rating + '\u2605' : ''}</span>
+          </div>
+          ${noteRow('Top', p.notes?.top, 'top')}
+          ${noteRow('Heart', p.notes?.mid, 'mid')}
+          ${noteRow('Base', p.notes?.base, 'base')}
+          ${noteRow('Notes', p.notes?.general, 'general')}
+          <div class="card-meta">
+            <span>${p.season || '—'}</span>
+            <span>${(p.occasion || []).join(', ') || '—'}</span>
+            <span>${p.pricePerMl ? 'Rp' + Math.round(p.pricePerMl).toLocaleString('id-ID') + '/ml' : '—'}</span>
+            <span>${p.rebuy ? 'Rebuy: ' + p.rebuy : '—'}</span>
+          </div>
+          ${p.comments ? '<span class="flip-hint">tap for your notes \u2192</span>' : ''}
         </div>
-        <span class="rating">${p.rating != null ? p.rating + '\u2605' : ''}</span>
-      </div>
-      ${noteRow('Top', p.notes?.top, 'top')}
-      ${noteRow('Heart', p.notes?.mid, 'mid')}
-      ${noteRow('Base', p.notes?.base, 'base')}
-      ${noteRow('Notes', p.notes?.general, 'general')}
-      <div class="card-meta">
-        <span>${p.season || '—'}</span>
-        <span>${(p.occasion || []).join(', ') || '—'}</span>
-        <span>${p.pricePerMl ? 'Rp' + Math.round(p.pricePerMl).toLocaleString('id-ID') + '/ml' : '—'}</span>
-        <span>${p.rebuy ? 'Rebuy: ' + p.rebuy : '—'}</span>
+        <div class="card-back">
+          <h3>${p.name}</h3>
+          <p class="back-comment">${p.comments ? '"' + p.comments + '"' : 'No comments logged yet.'}</p>
+          <span class="flip-hint">\u2190 tap to flip back</span>
+        </div>
       </div>
     </div>
   `).join('');
+}
+
+/* ---------- Card flip (event delegation, set up once) ---------- */
+function setupCardFlip(){
+  const grid = document.getElementById('collectionGrid');
+  if (grid.dataset.flipBound) return; // avoid double-binding across re-renders
+  grid.dataset.flipBound = 'true';
+  grid.addEventListener('click', e => {
+    const flip = e.target.closest('.card-flip');
+    if (flip) flip.classList.toggle('flipped');
+  });
 }
 
 function noteRow(label, notes, cls){
@@ -360,37 +422,62 @@ function setupAddForm(perfumes){
     const val = id => document.getElementById(id).value.trim();
     const num = id => { const v = val(id); return v ? parseFloat(v) : null; };
     const price = num('aPrice'), size = num('aSize');
+
+    const fields = {
+      name: val('aName'), brand: val('aBrand'), concentration: val('aConc'),
+      sizeMl: size, price: price, purchaseDate: val('aDate'),
+      top: val('aTop'), mid: val('aMid'), base: val('aBase'), general: val('aGeneral'),
+      accordFamily: val('aAccord'), season: val('aSeason'), occasion: val('aOccasion'),
+      rating: num('aRating'), longevity: null, sillage: val('aSillage'),
+      wearFrequency: '', rebuy: val('aRebuy'), comments: val('aComments'),
+    };
+
+    if (USING_LIVE_SHEET){
+      document.getElementById('addResult').innerHTML = `<div class="result-box"><p>Saving to your sheet...</p></div>`;
+      fetch(SHEET_API_URL, {
+        method: 'POST',
+        body: JSON.stringify({ ...fields, secret: WRITE_SECRET }) // plain-text body avoids CORS preflight issues with Apps Script
+      })
+        .then(r => r.json())
+        .then(res => {
+          if (res.error){
+            document.getElementById('addResult').innerHTML =
+              `<div class="result-box"><p class="result-headline">Couldn't save</p><p class="result-sub">${res.error} — check WRITE_SECRET matches SECRET in apps-script.gs.</p></div>`;
+            return;
+          }
+          document.getElementById('addResult').innerHTML =
+            `<div class="result-box"><p class="result-headline">Saved as ${res.id}</p><p class="result-sub">Added straight to your Google Sheet. Refresh the page to see it in the charts and grid below.</p></div>`;
+          document.getElementById('addForm').reset();
+        })
+        .catch(err => {
+          document.getElementById('addResult').innerHTML =
+            `<div class="result-box"><p class="result-headline">Couldn't reach the sheet</p><p class="result-sub">${err}</p></div>`;
+        });
+      return;
+    }
+
+    // Fallback: no live sheet connected yet — generate a JSON block to paste manually
     const nextNum = perfumes.length + 1;
     const obj = {
       id: 'P' + String(nextNum).padStart(3, '0'),
-      name: val('aName'),
-      brand: val('aBrand'),
-      concentration: val('aConc'),
-      sizeMl: size,
-      price: price,
-      pricePerMl: (price && size) ? Math.round((price/size)*100)/100 : null,
-      purchaseDate: val('aDate'),
+      name: fields.name, brand: fields.brand, concentration: fields.concentration,
+      sizeMl: fields.sizeMl, price: fields.price,
+      pricePerMl: (fields.price && fields.sizeMl) ? Math.round((fields.price/fields.sizeMl)*100)/100 : null,
+      purchaseDate: fields.purchaseDate,
       notes: {
-        top: parseNoteInput(val('aTop')),
-        mid: parseNoteInput(val('aMid')),
-        base: parseNoteInput(val('aBase')),
-        general: parseNoteInput(val('aGeneral')),
+        top: parseNoteInput(fields.top), mid: parseNoteInput(fields.mid),
+        base: parseNoteInput(fields.base), general: parseNoteInput(fields.general),
       },
-      accordFamily: val('aAccord'),
-      season: val('aSeason'),
-      occasion: parseNoteInput(val('aOccasion')),
-      rating: num('aRating'),
-      longevity: null,
-      sillage: val('aSillage'),
-      wearFrequency: '',
-      rebuy: val('aRebuy'),
-      comments: val('aComments'),
+      accordFamily: fields.accordFamily, season: fields.season,
+      occasion: parseNoteInput(fields.occasion), rating: fields.rating,
+      longevity: null, sillage: fields.sillage, wearFrequency: '',
+      rebuy: fields.rebuy, comments: fields.comments,
     };
     const jsonText = JSON.stringify(obj, null, 2) + ',';
     document.getElementById('addResult').innerHTML = `
       <div class="result-box">
         <p class="result-headline">Ready to paste</p>
-        <p class="result-sub">Copy this, then on GitHub open data.json, paste it right before the last perfume entry (or right after the opening "perfumes": [ if it's your first).</p>
+        <p class="result-sub">Copy this, then on GitHub open data.json, paste it right before the last perfume entry (or right after the opening "perfumes": [ if it's your first). Tip: connect Google Sheets (see README) and this becomes a one-click save instead.</p>
         <div class="json-output" id="jsonOutput">${jsonText.replace(/</g,'&lt;')}</div>
         <button class="copy-btn" id="copyBtn">Copy JSON</button>
       </div>

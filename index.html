@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fragrance Archive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow">A personal olfactory record</p>
+    <h1 id="archiveTitle">Fragrance Archive</h1>
+    <p class="hero-sub">Every bottle, broken down into what it actually smells like — and what that says about what I reach for.</p>
+  </div>
+
+  <div class="pyramid" aria-label="Fragrance pyramid: top, heart, and base notes">
+    <div class="pyramid-band band-top">
+      <span class="band-label">Top</span>
+      <span class="band-desc">First impression, 5–15 min</span>
+    </div>
+    <div class="pyramid-band band-heart">
+      <span class="band-label">Heart</span>
+      <span class="band-desc">The core, emerges after top fades</span>
+    </div>
+    <div class="pyramid-band band-base">
+      <span class="band-label">Base</span>
+      <span class="band-desc">What lingers on skin for hours</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section class="panel" id="wheelSection">
+    <div class="panel-head">
+      <h2>Accord Wheel</h2>
+      <p class="panel-sub">Which note families show up most across the collection</p>
+    </div>
+    <svg id="accordWheel" viewBox="0 0 400 400"></svg>
+  </section>
+
+  <section class="panel two-col">
+    <div>
+      <div class="panel-head">
+        <h2>Brand Breakdown</h2>
+        <p class="panel-sub">Bottles owned per brand</p>
+      </div>
+      <svg id="brandChart" viewBox="0 0 480 320"></svg>
+    </div>
+    <div>
+      <div class="panel-head">
+        <h2>Does Rating Predict Rebuy?</h2>
+        <p class="panel-sub">Average rating grouped by rebuy answer</p>
+      </div>
+      <svg id="rebuyChart" viewBox="0 0 480 320"></svg>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Price per ml vs Rating</h2>
+      <p class="panel-sub">Does spending more actually get you a scent you rate higher? Colour = rebuy answer</p>
+    </div>
+    <svg id="priceChart" viewBox="0 0 700 340"></svg>
+    <div class="legend" id="priceLegend"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Collection</h2>
+      <p class="panel-sub"><span id="perfumeCount">0</span> bottles logged</p>
+    </div>
+    <div class="filters">
+      <select id="brandFilter"><option value="">All brands</option></select>
+      <select id="seasonFilter"><option value="">All seasons</option></select>
+      <select id="occasionFilter"><option value="">All occasions</option></select>
+    </div>
+    <div class="grid" id="collectionGrid"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Coverage Gaps</h2>
+      <p class="panel-sub">Season × occasion — empty cells are where you're under-stocked</p>
+    </div>
+    <div id="gapTable"></div>
+  </section>
+
+</main>
+
+<footer>
+  <p>Data lives in <code>data.json</code> — edit it, commit, push. The page reads straight from it.</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

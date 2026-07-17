@@ -1,0 +1,1088 @@
+{
+  "owner": "Angel's Fragrance Archive",
+  "perfumes": [
+    {
+      "id": "P001",
+      "name": "The Tea",
+      "brand": "Earthora",
+      "concentration": "EDP",
+      "sizeMl": 50.0,
+      "price": 249000.0,
+      "pricePerMl": 4980.0,
+      "purchaseDate": "07/07/2026",
+      "notes": {
+        "top": [
+          "Pu'er Tea",
+          "Damp Soil",
+          "Cardamom"
+        ],
+        "mid": [
+          "Winter Melon",
+          "Sugar Cane",
+          "Fig Leaf"
+        ],
+        "base": [
+          "White Musk",
+          "Cedarwood",
+          "Sandalwood",
+          "Oud"
+        ],
+        "general": []
+      },
+      "accordFamily": "",
+      "season": "All-Season",
+      "occasion": [
+        "Everyday"
+      ],
+      "rating": 3.5,
+      "longevity": null,
+      "sillage": "Light",
+      "wearFrequency": "",
+      "rebuy": "Maybe",
+      "comments": "Can not smell the tea and winter melon, spa like smell"
+    },
+    {
+      "id": "P002",
+      "name": "Pain Perdu",
+      "brand": "Etre",
+      "concentration": "EDP",
+      "sizeMl": 50.0,
+      "price": 240000.0,
+      "pricePerMl": 4800.0,
+      "purchaseDate": "11/07/2026",
+      "notes": {
+        "top": [],
+        "mid": [],
+        "base": [],
+        "general": [
+          "Neroli Essential Oil",
+          "Honey",
+          "Toasted Brioche"
+        ]
+      },
+      "accordFamily": "Gourmand/Floral",
+      "season": "Night/Winter",
+      "occasion": [],
+      "rating": 3.0,
+      "longevity": null,
+      "sillage": "Light",
+      "wearFrequency": "",
+      "rebuy": "No",
+      "comments": "Not the gourmand I expected, not sweet w/ toasted / burnish smell, reminds me a bit of herbal soup. Maybe I need to test it more"
+    },
+    {
+      "id": "P003",
+      "name": "Matcha Muse",
+      "brand": "Etre",
+      "concentration": "EDP",
+      "sizeMl": 50.0,
+      "price": 350000.0,
+      "pricePerMl": 7000.0,
+      "purchaseDate": "11/07/2026",
+      "notes": {
+        "top": [],
+        "mid": [],
+        "base": [],
+        "general": [
+          "Mate Absolute",
+          "Violet Leaf Absolute",
+          "Tonka Bean Absolute",
+          "Umami Accord"
+        ]
+      },
+      "accordFamily": "Gourmand/Green",
+      "season": "Day/Summer",
+      "occasion": [],
+      "rating": 3.0,
+      "longevity": null,
+      "sillage": "",
+      "wearFrequency": "",
+      "rebuy": "No",
+      "comments": "Need to test it more, but can say it's unique, not mass pleasing at all. Smells a bit nutty"
+    },
+    {
+      "id": "P004",
+      "name": "Neera",
+      "brand": "Gerimist",
+      "concentration": "EDP",
+      "sizeMl": 10.0,
+      "price": 94800.0,
+      "pricePerMl": 9480.0,
+      "purchaseDate": "14/06/2026",
+      "notes": {
+        "top": [
+          "Pandan",
+          "Neera (Palm Nectar)"
+        ],
+        "mid": [
+          "Jasmine",
+          "Frangipani",
+          "Rose"
+        ],
+        "base": [
+          "Sandalwood",
+          "Amber",
+          "Patchouli"
+        ],
+        "general": []
+      },
+      "accordFamily": "Gourmand/Floral",
+      "season": "All-Season",
+      "occasion": [],
+      "rating": 4.5,
+      "longevity": null,
+      "sillage": "Moderate",
+      "wearFrequency": "",
+      "rebuy": "Yes",
+      "comments": "Nice, opens up with pandan and sweet like smell, then fades out floral from frangipani, ends up smelling soapy"
+    },
+    {
+      "id": "P005",
+      "name": "Pandan Sticky Rice",
+      "brand": "Mykonos",
+      "concentration": "EDP",
+      "sizeMl": 50.0,
+      "price": 137400.0,
+      "pricePerMl": 2748.0,
+      "purchaseDate": "05/05/2026",
+      "notes": {
+        "top": [
+          "Rice",
+          "Almond",
+          "Lactonic"
+        ],
+        "mid": [
+          "Jasmine",
+          "Ylang-Ylang",
+          "Lily of the Valley",
+          "Pandan"
+        ],
+        "base": [
+          "Amber",
+          "Vanilla",
+          "Sandalwood"
+        ],
+        "general": []
+      },
+      "accordFamily": "Gourmand/Floral",
+      "season": "Night/Winter",
+      "occasion": [],
+      "rating": 1.0,
+      "longevity": null,
+      "sillage": "Heavy",
+      "wearFrequency": "",
+      "rebuy": "No",
+      "comments": "Smells like coco pandan. Not a fan, cannot smell the sticky rice or the rice "
+    },
+    {
+      "id": "P006",
+      "name": "Goma",
+      "brand": "OnlyNusa",
+      "concentration": "EDP",
+      "sizeMl": 60.0,
+      "price": 226107.0,
+      "pricePerMl": 3768.45,
+      "purchaseDate": "05/05/2026",
+      "notes": {
+        "top": [
+          "White Musk"
+        ],
+        "mid": [
+          "Sesame",
+          "Mimosa"
+        ],
+        "base": [
+          "Woody Notes"
+        ],
+        "general": []
+      },
+      "accordFamily": "Gourmand/Floral",
+      "season": "All-Season",
+      "occasion": [
+        "Office",
+        "Everyday"
+      ],
+      "rating": 5.0,
+      "longevity": null,
+      "sillage": "Moderate",
+      "wearFrequency": "",
+      "rebuy": "Yes",
+      "comments": "Smells flowery, mimosa, musky, and a bit nutty"
+    },
+    {
+      "id": "P007",
+      "name": "Fragrant Rice",
+      "brand": "Gerimist",
+      "concentration": "EDP",
+      "sizeMl": 10.0,
+      "price": 105200.0,
+      "pricePerMl": 10520.0,
+      "purchaseDate": "10/04/2026",
+      "notes": {
+        "top": [
+          "Fresh Cut Grass",
+          "Mandarin Orange",
+          "Ginger"
+        ],
+        "mid": [
+          "Jasmine",
+          "Petitgrain",
+          "Steamed Rice",
+          "Vetiver"
+        ],
+        "base": [
+          "Musk",
+          "Guaiac Wood",
+          "Tonka Bean"
+        ],
+        "general": []
+      },
+      "accordFamily": "Green/Musky/Spicy",
+      "season": "All-Season",
+      "occasion": [
+        "Everyday",
+        "Office"
+      ],
+      "rating": 4.0,
+      "longevity": null,
+      "sillage": "Light",
+      "wearFrequency": "",
+      "rebuy": "Yes",
+      "comments": "Opens up with freshly cut grass and ended up a little bit powdery, although the rice itself is not really obvious"
+    },
+    {
+      "id": "P008",
+      "name": "Alaya",
+      "brand": "Studio Sable",
+      "concentration": "EDP",
+      "sizeMl": 50.0,
+      "price": 215560.0,
+      "pricePerMl": 4311.2,
+      "purchaseDate": "03/03/2026",
+      "notes": {
+        "top": [],
+        "mid": [],
+        "base": [],
+        "general": [
+          "Cedrat EO",
+          "Nutmeg EO",
+          "Magnolia accord",
+          "Ylang-Ylang EO",
+          "Moss accord",
+          "Patchouli EO",
+          "Sandalwood India EO"
+        ]
+      },
+      "accordFamily": "Chypre/Floral/Woody",
+      "season": "All-Season",
+      "occasion": [
+        "Everyday",
+        "Office"
+      ],
+      "rating": 3.5,
+      "longevity": null,
+      "sillage": "",
+      "wearFrequency": "",
+      "rebuy": "No",
+      "comments": "Pretty scent, but honestly not really in my daily rotation"
+    },
+    {
+      "id": "P009",
+      "name": "White Fountain",
+      "brand": "Melloculab",
+      "concentration": "EDP",
+      "sizeMl": 50.0,
+      "price": 340737.0,
+      "pricePerMl": 6814.74,
+      "purchaseDate": "25/02/2026",
+      "notes": {
+        "top": [],
+        "mid": [],
+        "base": [],
+        "general": [
+          "Mandarin",
+          "Pink Pepper",
+          "Muguet",
+          "Iris",
+          "Alba",
+          "Ambergris",
+          "Cashmeran"
+        ]
+      },
+      "accordFamily": "Floral/Musky/Clean",
+      "season": "All-Season",
+      "occasion": [
+        "Everyday",
+        "Office",
+        "Date"
+      ],
+      "rating": 5.0,
+      "longevity": null,
+      "sillage": "",
+      "wearFrequency": "",
+      "rebuy": "Yes",
+      "comments": "Smells really pretty, but I like the vial more than full bottle. Maybe vial's a bit oxidized"
+    },
+    {
+      "id": "P010",
+      "name": "Grounded Whisper",
+      "brand": "Personal Chemistry",
+      "concentration": "EDP",
+      "sizeMl": 50.0,
+      "price": 318985.0,
+      "pricePerMl": 6379.7,
+      "purchaseDate": "25/02/2026",
+      "notes": {
+        "top": [
+          "Fig Tree Leaves",
+          "Lilac"
+        ],
+        "mid": [
+          "Osmanthus",
+          "Ylang-Ylang"
+        ],
+        "base": [
+          "Haiti Vetiver",
+          "Satin Musk"
+        ],
+        "general": []
+      },
+      "accordFamily": "Floral/Musky/Clean",
+      "season": "All-Season",
+      "occasion": [
+        "Everyday",
+        "Office",
+        "Date"
+      ],
+      "rating": 5.0,
+      "longevity": null,
+      "sillage": "",
+      "wearFrequency": "",
+      "rebuy": "Yes",
+      "comments": "Smelly very powdery, a bit nutty, but overall powdery"
+    },
+    {
+      "id": "P011",
+      "name": "Unspoken",
+      "brand": "Personal Chemistry",
+      "concentration": "EDP",
+      "sizeMl": 50.0,
+      "price": 318985.0,
+      "pricePerMl": 6379.7,
+      "purchaseDate": "25/02/2026",
+      "notes": {
+        "top": [
+          "Plum",
+          "Pink Pepper",
+          "Cardamom"
+        ],
+        "mid": [
+          "Damascena Rose",
+          "Incenses",
+          "Elemi"
+        ],
+        "base": [
+          "Patchouli",
+          "Gaiac Wood",
+          "Cypriol"
+        ],
+        "general": []
+      },
+      "accordFamily": "Woody/Floral",
+      "season": "All-Season",
+      "occasion": [
+        "Everyday",
+        "Office",
+        "Date",
+        "Special Event"
+      ],
+      "rating": 5.0,
+      "longevity": null,
+      "sillage": "",
+      "wearFrequency": "",
+      "rebuy": "Yes",
+      "comments": "Rose + Incense"
+    },
+    {
+      "id": "P012",
+      "name": "No Ordinary Days",
+      "brand": "Personal Chemistry",
+      "concentration": "EDP",
+      "sizeMl": 50.0,
+      "price": 571404.0,
+      "pricePerMl": 11428.08,
+      "purchaseDate": "02/02/2026",
+      "notes": {
+        "top": [
+          "Scalary Sage",
+          "Violet Leaves"
+        ],
+        "mid": [
+          "Jasmine Sambac",
+          "Geranium",
+          "Tea Leaves"
+        ],
+        "base": [
+          "Rain Accord",
+          "White Musk"
+        ],
+        "general": []
+      },
+      "accordFamily": "Tea/Floral/Green",
+      "season": "All-Season",
+      "occasion": [
+        "Everyday",
+        "Office",
+        "Date"
+      ],
+      "rating": 4.0,
+      "longevity": null,
+      "sillage": "",
+      "wearFrequency": "",
+      "rebuy": "No",
+      "comments": "I cannot really smell the tea, like the scent was pretty but almost non existent"
+    },
+    {
+      "id": "P013",
+      "name": "Vanilla Borealis",
+      "brand": "Melloculab",
+      "concentration": "EDP",
+      "sizeMl": 50.0,
+      "price": 378250.0,
+      "pricePerMl": 7565.0,
+      "purchaseDate": "25/01/2026",
+      "notes": {
+        "top": [
+          "Spearmint",
+          "Juniper Berries",
+          "Cold Metal"
+        ],
+        "mid": [
+          "Cognac",
+          "Vanilla",
+          "Tonka"
+        ],
+        "base": [
+          "Labdanum",
+          "Musk",
+          "Cedarwood"
+        ],
+        "general": []
+      },
+      "accordFamily": "Warm/Vanilla/Wood",
+      "season": "Night/Winter",
+      "occasion": [
+        "Special Event"
+      ],
+      "rating": 3.5,
+      "longevity": null,
+      "sillage": "",
+      "wearFrequency": "",
+      "rebuy": "No",
+      "comments": "Turns out I'm not a fan of mint"
+    },
+    {
+      "id": "P014",
+      "name": "Hugs",
+      "brand": "Alien Objects",
+      "concentration": "EDP",
+      "sizeMl": 10.0,
+      "price": 214500.0,
+      "pricePerMl": 21450.0,
+      "purchaseDate": "13/10/2025",
+      "notes": {
+        "top": [],
+        "mid": [],
+        "base": [],
+        "general": [
+          "Vanilla",
+          "Orchid",
+          "Almond",
+          "Amber",
+          "Rum",
+          "Benzoin"
+        ]
+      },
+      "accordFamily": "Warm/Vanilla/Wood",
+      "season": "All-Season",
+      "occasion": [
+        "Special Event"
+      ],
+      "rating": 4.0,
+      "longevity": null,
+      "sillage": "",
+      "wearFrequency": "",
+      "rebuy": "Maybe",
+      "comments": "Turns out I'm not a fan of cognac"
+    },
+    {
+      "id": "P015",
+      "name": "Jade Serenity",
+      "brand": "Earth Love Life",
+      "concentration": "EDP",
+      "sizeMl": 50.0,
+      "price": 205150.0,
+      "pricePerMl": 4103.0,
+      "purchaseDate": "13/07/2025",
+      "notes": {
+        "top": [
+          "Bergamot",
+          "Violet Leaf",
+          "Peppermint Oil"
+        ],
+        "mid": [
+          "Mimosa Absolute",
+          "Oolong Tea",
+          "Bulgarian Rose"
+        ],
+        "base": [
+          "Sulawesi Patchouli",
+          "Cedarwood",
+          "Ambrostar"
+        ],
+        "general": []
+      },
+      "accordFamily": "Tea/Green",
+      "season": "Day/Summer",
+      "occasion": [
+        "Everyday",
+        "Gym",
+        "Office"
+      ],
+      "rating": 3.5,
+      "longevity": null,
+      "sillage": "",
+      "wearFrequency": "",
+      "rebuy": "No",
+      "comments": "Typical not really impressing me"
+    },
+    {
+      "id": "P016",
+      "name": "Moonlight",
+      "brand": "Etre",
+      "concentration": "EDP",
+      "sizeMl": 50.0,
+      "price": 392150.0,
+      "pricePerMl": 7843.0,
+      "purchaseDate": "28/06/2025",
+      "notes": {
+        "top": [],
+        "mid": [],
+        "base": [],
+        "general": [
+          "Lavender EO",
+          "Pink Pepper CO2",
+          "Angelica Seed EO",
+          "Opoponax EO",
+          "Amyrix EO",
+          "cotton musk",
+          "midnight air"
+        ]
+      },
+      "accordFamily": "Aromatic/Aldehyde",
+      "season": "Night/Winter",
+      "occasion": [],
+      "rating": 3.5,
+      "longevity": null,
+      "sillage": "",
+      "wearFrequency": "",
+      "rebuy": "No",
+      "comments": "Musky, aromatic, but a bit sharp. I can wear it but not my favorite"
+    },
+    {
+      "id": "P017",
+      "name": "Prana",
+      "brand": "Studio Sable",
+      "concentration": "EDP",
+      "sizeMl": 50.0,
+      "price": 480028.0,
+      "pricePerMl": 9600.56,
+      "purchaseDate": "14/01/2025",
+      "notes": {
+        "top": [],
+        "mid": [],
+        "base": [],
+        "general": [
+          "Fig accord",
+          "Lavandin EO",
+          "Nutmeg EO",
+          "Tuberose Absolute",
+          "Mate accord",
+          "Soil accord"
+        ]
+      },
+      "accordFamily": "Green/Floral/Woody",
+      "season": "All-Season",
+      "occasion": [],
+      "rating": 3.0,
+      "longevity": null,
+      "sillage": "",
+      "wearFrequency": "",
+      "rebuy": "No",
+      "comments": "Aromatic, can really smell the spices, but not a fan. Maybe I dont like fig (?)"
+    },
+    {
+      "id": "P018",
+      "name": "Smells Like a Baby",
+      "brand": "House of Dappers",
+      "concentration": "EDP",
+      "sizeMl": 50.0,
+      "price": 162385.0,
+      "pricePerMl": 3247.7,
+      "purchaseDate": "25/12/2024",
+      "notes": {
+        "top": [
+          "Powdery Notes",
+          "Freesia",
+          "Iris",
+          "Aldehyde"
+        ],
+        "mid": [
+          "Violet",
+          "Rose"
+        ],
+        "base": [
+          "Iso E Super",
+          "Musk",
+          "Sandalwood",
+          "Patchouli"
+        ],
+        "general": []
+      },
+      "accordFamily": "",
+      "season": "All-Season",
+      "occasion": [],
+      "rating": 2.0,
+      "longevity": null,
+      "sillage": "",
+      "wearFrequency": "",
+      "rebuy": "No",
+      "comments": "Not impressive, not the baby powder scent I'm looking for."
+    },
+    {
+      "id": "P019",
+      "name": "Baby Powder",
+      "brand": "Kundal",
+      "concentration": "Cologne",
+      "sizeMl": 100.0,
+      "price": 85840.0,
+      "pricePerMl": 858.4,
+      "purchaseDate": "25/12/2024",
+      "notes": {
+        "top": [],
+        "mid": [],
+        "base": [],
+        "general": []
+      },
+      "accordFamily": "",
+      "season": "",
+      "occasion": [],
+      "rating": 4.0,
+      "longevity": null,
+      "sillage": "",
+      "wearFrequency": "",
+      "rebuy": "Maybe",
+      "comments": "The baby powder scent I'm looking for, just sad it's in body mist form"
+    },
+    {
+      "id": "P020",
+      "name": "Zwitsal",
+      "brand": "Zwitsal",
+      "concentration": "Cologne",
+      "sizeMl": 100.0,
+      "price": 18049.0,
+      "pricePerMl": 180.49,
+      "purchaseDate": "25/12/2024",
+      "notes": {
+        "top": [],
+        "mid": [],
+        "base": [],
+        "general": []
+      },
+      "accordFamily": "",
+      "season": "",
+      "occasion": [],
+      "rating": 2.0,
+      "longevity": null,
+      "sillage": "",
+      "wearFrequency": "",
+      "rebuy": "No",
+      "comments": "Not a fan"
+    },
+    {
+      "id": "P021",
+      "name": "L'Heure Doree",
+      "brand": "Studio Sable",
+      "concentration": "EDP",
+      "sizeMl": 50.0,
+      "price": 391047.0,
+      "pricePerMl": 7820.94,
+      "purchaseDate": "31/08/2024",
+      "notes": {
+        "top": [],
+        "mid": [],
+        "base": [],
+        "general": [
+          "Red Mandarin EO",
+          "Labdanum Abs",
+          "Jasmin Sambac EO",
+          "Violet Leaves Abs",
+          "Peach Accords",
+          "Black Tea Accords"
+        ]
+      },
+      "accordFamily": "Floral/Ambery/Woody/Tea",
+      "season": "All-Season",
+      "occasion": [
+        "Date",
+        "Special Event"
+      ],
+      "rating": 5.0,
+      "longevity": null,
+      "sillage": "",
+      "wearFrequency": "",
+      "rebuy": "Yes",
+      "comments": "Love, peachy, a bit of black tea, a bit floral, a bit cooling, I like it overall, a really good uplifting scent"
+    },
+    {
+      "id": "P022",
+      "name": "For the Memories of",
+      "brand": "Etre",
+      "concentration": "EDP",
+      "sizeMl": 50.0,
+      "price": 409306.0,
+      "pricePerMl": 8186.12,
+      "purchaseDate": "17/08/2024",
+      "notes": {
+        "top": [],
+        "mid": [],
+        "base": [],
+        "general": [
+          "Lime Essential Oil",
+          "Mandarin Essential Oil",
+          "Ylang-Ylang Essential Oil",
+          "Jasmine",
+          "Frankincense Resinoid",
+          "Elemi Essential Oil",
+          "Chamomile Essential Oil"
+        ]
+      },
+      "accordFamily": "Floral/Woody/Ambery",
+      "season": "All-Season",
+      "occasion": [
+        "Everyday",
+        "Special Event",
+        "Date",
+        "Office",
+        "Party"
+      ],
+      "rating": 5.0,
+      "longevity": null,
+      "sillage": "",
+      "wearFrequency": "",
+      "rebuy": "Yes",
+      "comments": "Love, reminds me of Bali, especially the temple. Need time to warm up to it at first, but slowly love it. Cannot really identified the chamomile, but I can smell the Ylang-Ylang"
+    },
+    {
+      "id": "P023",
+      "name": "Tout Feu Tout Flamme",
+      "brand": "Etre",
+      "concentration": "EDP",
+      "sizeMl": 50.0,
+      "price": 255575.0,
+      "pricePerMl": 5111.5,
+      "purchaseDate": "17/07/2024",
+      "notes": {
+        "top": [],
+        "mid": [],
+        "base": [],
+        "general": [
+          "Clary Sage",
+          "Cistus Labdanum",
+          "Vanilla",
+          "Tobacco"
+        ]
+      },
+      "accordFamily": "Fougere/Ambery/Woody",
+      "season": "Night/Winter",
+      "occasion": [
+        "Special Event"
+      ],
+      "rating": 4.0,
+      "longevity": null,
+      "sillage": "Heavy",
+      "wearFrequency": "",
+      "rebuy": "Maybe",
+      "comments": "Maybe, because I might not be able to finish this ever"
+    },
+    {
+      "id": "P024",
+      "name": "Unspoken",
+      "brand": "Personal Chemistry",
+      "concentration": "EDP",
+      "sizeMl": 10.0,
+      "price": 174093.0,
+      "pricePerMl": 17409.3,
+      "purchaseDate": "26/05/2024",
+      "notes": {
+        "top": [
+          "Plum",
+          "Pink Pepper",
+          "Cardamom"
+        ],
+        "mid": [
+          "Damascena Rose",
+          "Incenses",
+          "Elemi"
+        ],
+        "base": [
+          "Patchouli",
+          "Gaiac Wood",
+          "Cypriol"
+        ],
+        "general": []
+      },
+      "accordFamily": "Woody/Floral",
+      "season": "Rainy/Fresh",
+      "occasion": [],
+      "rating": 5.0,
+      "longevity": null,
+      "sillage": "",
+      "wearFrequency": "",
+      "rebuy": "Yes",
+      "comments": "So far the only incense perfume I like"
+    },
+    {
+      "id": "P025",
+      "name": "Velvet Kiss",
+      "brand": "Personal Chemistry",
+      "concentration": "EDP",
+      "sizeMl": 10.0,
+      "price": 174093.0,
+      "pricePerMl": 17409.3,
+      "purchaseDate": "26/05/2024",
+      "notes": {
+        "top": [
+          "Juicy Tangerine",
+          "Davana",
+          "Raspberry"
+        ],
+        "mid": [
+          "Orange Blossom",
+          "Damascena Rose",
+          "Violet",
+          "Cyclamen"
+        ],
+        "base": [
+          "Orris",
+          "Cashmeran",
+          "Cedarwood"
+        ],
+        "general": []
+      },
+      "accordFamily": "Woody/Floral",
+      "season": "All-Season",
+      "occasion": [
+        "Everyday"
+      ],
+      "rating": 3.5,
+      "longevity": null,
+      "sillage": "",
+      "wearFrequency": "",
+      "rebuy": "Maybe",
+      "comments": "Typical, not really that impressive / mind blowing"
+    },
+    {
+      "id": "P026",
+      "name": "Buai",
+      "brand": "Rumah Atsiri",
+      "concentration": "EDP",
+      "sizeMl": 10.0,
+      "price": 87355.0,
+      "pricePerMl": 8735.5,
+      "purchaseDate": "26/05/2024",
+      "notes": {
+        "top": [
+          "Cardamom",
+          "Mimosa",
+          "Cinnamon",
+          "Cinnamon Leaves"
+        ],
+        "mid": [
+          "Benzoin",
+          "Lavender",
+          "Cinnamon Bark",
+          "Orange Blossom"
+        ],
+        "base": [
+          "Vanilla Bean",
+          "Musk",
+          "Sandalwood",
+          "Tonka Beans"
+        ],
+        "general": []
+      },
+      "accordFamily": "Sweet/Spicy/Gourmand",
+      "season": "Night/Winter",
+      "occasion": [],
+      "rating": 2.5,
+      "longevity": null,
+      "sillage": "",
+      "wearFrequency": "",
+      "rebuy": "No",
+      "comments": "Like the hand sanitizer, but I guess not the perfume. Gave it to mom"
+    },
+    {
+      "id": "P027",
+      "name": "Ikebana",
+      "brand": "Studio Sable",
+      "concentration": "EDP",
+      "sizeMl": 50.0,
+      "price": 459485.0,
+      "pricePerMl": 9189.7,
+      "purchaseDate": "20/05/2024",
+      "notes": {
+        "top": [],
+        "mid": [],
+        "base": [],
+        "general": [
+          "Cedarwood Virginia EO",
+          "Caraway EO",
+          "Petitgrain Paraguay EO",
+          "Cardamom EO",
+          "Orange Blossom Accords",
+          "Steam Accords",
+          "Linen Accords"
+        ]
+      },
+      "accordFamily": "Fougere/Floral/Woody",
+      "season": "All-Season",
+      "occasion": [],
+      "rating": 5.0,
+      "longevity": null,
+      "sillage": "",
+      "wearFrequency": "",
+      "rebuy": "Yes",
+      "comments": "Love, it's unique, fresh, beautiful on all occassions"
+    },
+    {
+      "id": "P028",
+      "name": "A Place We Call Home",
+      "brand": "Etre",
+      "concentration": "EDP",
+      "sizeMl": 50.0,
+      "price": 450119.0,
+      "pricePerMl": 9002.38,
+      "purchaseDate": "21/04/2024",
+      "notes": {
+        "top": [],
+        "mid": [],
+        "base": [],
+        "general": [
+          "Red Mandarin EO",
+          "Frankincense EO",
+          "Nutmeg EO",
+          "Jasmin Sambac India Abs",
+          "Vetiver Java EO",
+          "Frangipani Abs"
+        ]
+      },
+      "accordFamily": "Floral/Woody/Musky",
+      "season": "All-Season",
+      "occasion": [],
+      "rating": 5.0,
+      "longevity": null,
+      "sillage": "",
+      "wearFrequency": "",
+      "rebuy": "Yes",
+      "comments": "Genuinely reminds me of Bali, beach, holiday. Unique smell I never encountered before"
+    },
+    {
+      "id": "P029",
+      "name": "Angelique",
+      "brand": "Etre",
+      "concentration": "EDP",
+      "sizeMl": 50.0,
+      "price": 300920.0,
+      "pricePerMl": 6018.4,
+      "purchaseDate": "27/03/2024",
+      "notes": {
+        "top": [],
+        "mid": [],
+        "base": [],
+        "general": [
+          "Carrot Seed",
+          "Lilac",
+          "Iris",
+          "Musk",
+          "Ginger"
+        ]
+      },
+      "accordFamily": "Floral/Musky/Woody",
+      "season": "",
+      "occasion": [],
+      "rating": 3.0,
+      "longevity": null,
+      "sillage": "",
+      "wearFrequency": "",
+      "rebuy": "No",
+      "comments": "I sold it. Just not my cup of coffee. Expected a lot from the notes list but sadly just not for me."
+    },
+    {
+      "id": "P030",
+      "name": "Volcanique",
+      "brand": "Etre",
+      "concentration": "EDP",
+      "sizeMl": 50.0,
+      "price": 271680.0,
+      "pricePerMl": 5433.6,
+      "purchaseDate": "10/10/2023",
+      "notes": {
+        "top": [],
+        "mid": [],
+        "base": [],
+        "general": [
+          "Iris",
+          "Patchouli"
+        ]
+      },
+      "accordFamily": "Oriental/Floral/Woody",
+      "season": "All-Season",
+      "occasion": [],
+      "rating": 5.0,
+      "longevity": null,
+      "sillage": "",
+      "wearFrequency": "",
+      "rebuy": "Yes",
+      "comments": "One of my favorite gourmand-ish perfume, it smells a bit of vanilla / sweet, but not to sweet"
+    },
+    {
+      "id": "P031",
+      "name": "Force d'Ame",
+      "brand": "Etre",
+      "concentration": "EDP",
+      "sizeMl": 50.0,
+      "price": 271680.0,
+      "pricePerMl": 5433.6,
+      "purchaseDate": "10/10/2023",
+      "notes": {
+        "top": [],
+        "mid": [],
+        "base": [],
+        "general": [
+          "Rose",
+          "Cedarwood"
+        ]
+      },
+      "accordFamily": "Floral/Woody/Musky",
+      "season": "All-Season",
+      "occasion": [],
+      "rating": 3.5,
+      "longevity": null,
+      "sillage": "",
+      "wearFrequency": "",
+      "rebuy": "Maybe",
+      "comments": "Used to like it, but now seems a bit boring"
+    }
+  ]
+}

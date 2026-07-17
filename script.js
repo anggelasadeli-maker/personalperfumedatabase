@@ -9,9 +9,12 @@ fetch('data.json')
       `<p style="color:#a33">Couldn't load data.json — if you opened this file directly, run a local server instead (see README). Error: ${err}</p>`;
   });
 
+let PERFUMES = [];
+
 function render(data){
   document.getElementById('archiveTitle').textContent = data.owner || 'Fragrance Archive';
   const perfumes = data.perfumes || [];
+  PERFUMES = perfumes;
   document.getElementById('perfumeCount').textContent = perfumes.length;
 
   renderAccordWheel(perfumes);
@@ -20,8 +23,10 @@ function render(data){
   renderPriceChart(perfumes);
   populateFilters(perfumes);
   renderGrid(perfumes);
+  setupPredictor(perfumes);
+  setupAddForm(perfumes);
 
-  ['brandFilter','seasonFilter','occasionFilter'].forEach(id =>
+  ['brandFilter','yearFilter','seasonFilter','occasionFilter'].forEach(id =>
     document.getElementById(id).addEventListener('change', () => renderGrid(perfumes, currentFilters()))
   );
 }
@@ -29,6 +34,7 @@ function render(data){
 function currentFilters(){
   return {
     brand: document.getElementById('brandFilter').value,
+    year: document.getElementById('yearFilter').value,
     season: document.getElementById('seasonFilter').value,
     occasion: document.getElementById('occasionFilter').value
   };
@@ -168,13 +174,24 @@ function renderPriceChart(perfumes){
 }
 
 /* ---------- Filters ---------- */
+function purchaseYear(p){
+  const d = p.purchaseDate;
+  if (!d) return null;
+  const parts = d.split('/');
+  return parts.length === 3 ? parts[2] : null;
+}
+
 function populateFilters(perfumes){
   const brands = [...new Set(perfumes.map(p => p.brand).filter(Boolean))].sort();
+  const years = [...new Set(perfumes.map(purchaseYear).filter(Boolean))].sort((a,b) => b - a);
   const seasons = [...new Set(perfumes.map(p => p.season).filter(Boolean))];
   const occasions = [...new Set(perfumes.flatMap(p => p.occasion || []))];
 
   const brandSel = document.getElementById('brandFilter');
   brands.forEach(b => brandSel.insertAdjacentHTML('beforeend', `<option value="${b}">${b}</option>`));
+
+  const yearSel = document.getElementById('yearFilter');
+  years.forEach(y => yearSel.insertAdjacentHTML('beforeend', `<option value="${y}">${y}</option>`));
 
   const seasonSel = document.getElementById('seasonFilter');
   seasons.forEach(s => seasonSel.insertAdjacentHTML('beforeend', `<option value="${s}">${s}</option>`));
@@ -188,6 +205,7 @@ function renderGrid(perfumes, filters = {}){
   const grid = document.getElementById('collectionGrid');
   const filtered = perfumes.filter(p => {
     if (filters.brand && p.brand !== filters.brand) return false;
+    if (filters.year && purchaseYear(p) !== filters.year) return false;
     if (filters.season && p.season !== filters.season) return false;
     if (filters.occasion && !(p.occasion || []).includes(filters.occasion)) return false;
     return true;
@@ -227,4 +245,162 @@ function noteRow(label, notes, cls){
     <span class="tag-label">${label}</span>
     <span class="tags">${notes.map(n => `<span class="tag ${cls}">${n}</span>`).join('')}</span>
   </div>`;
+}
+
+/* ---------- Note similarity helpers ---------- */
+function parseNoteInput(str){
+  return (str || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+}
+
+function allNotes(p){
+  const n = p.notes || {};
+  return [...(n.top||[]), ...(n.mid||[]), ...(n.base||[]), ...(n.general||[])]
+    .map(s => s.toLowerCase());
+}
+
+function jaccard(a, b){
+  const setA = new Set(a), setB = new Set(b);
+  if (!setA.size || !setB.size) return 0;
+  let inter = 0;
+  setA.forEach(x => { if (setB.has(x)) inter++; });
+  const union = new Set([...setA, ...setB]).size;
+  return inter / union;
+}
+
+/* ---------- Match Predictor ---------- */
+function setupPredictor(perfumes){
+  document.getElementById('predictorForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const candidateNotes = [
+      ...parseNoteInput(document.getElementById('pTop').value),
+      ...parseNoteInput(document.getElementById('pMid').value),
+      ...parseNoteInput(document.getElementById('pBase').value),
+      ...parseNoteInput(document.getElementById('pGeneral').value),
+    ];
+    const price = parseFloat(document.getElementById('pPrice').value) || null;
+    const size = parseFloat(document.getElementById('pSize').value) || null;
+    const name = document.getElementById('pName').value || 'This perfume';
+    const pricePerMl = (price && size) ? price / size : null;
+
+    if (!candidateNotes.length){
+      document.getElementById('predictorResult').innerHTML =
+        `<div class="result-box"><p>Add at least a few notes to compare against your collection.</p></div>`;
+      return;
+    }
+
+    const scored = perfumes
+      .map(p => ({ p, sim: jaccard(candidateNotes, allNotes(p)) }))
+      .filter(x => x.sim > 0)
+      .sort((a,b) => b.sim - a.sim);
+
+    const top = scored.slice(0, 5);
+
+    if (!top.length){
+      document.getElementById('predictorResult').innerHTML = `
+        <div class="result-box">
+          <p class="result-headline">No real overlap found</p>
+          <p class="result-sub">None of your notes match anything you already own — this would be a genuinely new direction, not a data point I can predict from.</p>
+          ${pricePerMl ? `<div class="stat-grid"><div class="stat-box"><div class="stat-label">Price / ml</div><div class="stat-value">Rp${Math.round(pricePerMl).toLocaleString('id-ID')}</div></div></div>` : ''}
+        </div>`;
+      return;
+    }
+
+    const weightSum = top.reduce((s,x) => s + x.sim, 0);
+    const predictedRating = top.reduce((s,x) => s + x.sim * x.p.rating, 0) / weightSum;
+    const rebuyYesWeight = top.filter(x => x.p.rebuy === 'Yes').reduce((s,x) => s + x.sim, 0);
+    const predictedRebuy = Math.round((rebuyYesWeight / weightSum) * 100);
+
+    const seasonVotes = {}, occVotes = {}, accordVotes = {};
+    top.forEach(({p, sim}) => {
+      if (p.season) seasonVotes[p.season] = (seasonVotes[p.season]||0) + sim;
+      (p.occasion||[]).forEach(o => occVotes[o] = (occVotes[o]||0) + sim);
+      (p.accordFamily||'').split('/').map(s=>s.trim()).filter(Boolean).forEach(a => accordVotes[a] = (accordVotes[a]||0) + sim);
+    });
+    const bestOf = obj => Object.entries(obj).sort((a,b)=>b[1]-a[1])[0]?.[0] || '—';
+    const predSeason = bestOf(seasonVotes);
+    const predOccasion = bestOf(occVotes);
+    const predAccord = Object.entries(accordVotes).sort((a,b)=>b[1]-a[1]).slice(0,2).map(x=>x[0]).join('/') || '—';
+
+    // Gap check against actual collection
+    const gapCount = perfumes.filter(p => p.season === predSeason && (p.occasion||[]).includes(predOccasion)).length;
+    const fillsGap = gapCount <= 1;
+
+    const matchRows = top.map(({p, sim}) =>
+      `<div class="match-row"><span>${p.name} (${p.brand}) — ${p.rating}★</span><span class="match-sim">${Math.round(sim*100)}% overlap</span></div>`
+    ).join('');
+
+    document.getElementById('predictorResult').innerHTML = `
+      <div class="result-box">
+        <p class="result-headline">${name}</p>
+        <p class="result-sub">Predicted from ${top.length} note-similar bottle${top.length>1?'s':''} in your collection</p>
+        <div class="stat-grid">
+          <div class="stat-box"><div class="stat-label">Predicted Rating</div><div class="stat-value">${predictedRating.toFixed(1)} ★</div></div>
+          <div class="stat-box"><div class="stat-label">Predicted Rebuy</div><div class="stat-value">${predictedRebuy}%</div></div>
+          <div class="stat-box"><div class="stat-label">Suggested Season</div><div class="stat-value" style="font-size:15px">${predSeason}</div></div>
+          <div class="stat-box"><div class="stat-label">Suggested Occasion</div><div class="stat-value" style="font-size:15px">${predOccasion}</div></div>
+          <div class="stat-box"><div class="stat-label">Likely Accord</div><div class="stat-value" style="font-size:15px">${predAccord}</div></div>
+          ${pricePerMl ? `<div class="stat-box"><div class="stat-label">Price / ml</div><div class="stat-value" style="font-size:15px">Rp${Math.round(pricePerMl).toLocaleString('id-ID')}</div></div>` : ''}
+        </div>
+        <div class="gap-flag ${fillsGap ? 'fills' : 'covered'}">
+          ${fillsGap
+            ? `You only own ${gapCount} bottle(s) for ${predSeason} + ${predOccasion} — this would fill a real gap.`
+            : `You already own ${gapCount} bottles for ${predSeason} + ${predOccasion} — this would be more overlap, not new coverage.`}
+        </div>
+        <p class="result-sub" style="margin-top:16px">Closest matches in your collection:</p>
+        <div class="match-list">${matchRows}</div>
+      </div>
+    `;
+  });
+}
+
+/* ---------- Add a Bottle ---------- */
+function setupAddForm(perfumes){
+  document.getElementById('addForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const val = id => document.getElementById(id).value.trim();
+    const num = id => { const v = val(id); return v ? parseFloat(v) : null; };
+    const price = num('aPrice'), size = num('aSize');
+    const nextNum = perfumes.length + 1;
+    const obj = {
+      id: 'P' + String(nextNum).padStart(3, '0'),
+      name: val('aName'),
+      brand: val('aBrand'),
+      concentration: val('aConc'),
+      sizeMl: size,
+      price: price,
+      pricePerMl: (price && size) ? Math.round((price/size)*100)/100 : null,
+      purchaseDate: val('aDate'),
+      notes: {
+        top: parseNoteInput(val('aTop')),
+        mid: parseNoteInput(val('aMid')),
+        base: parseNoteInput(val('aBase')),
+        general: parseNoteInput(val('aGeneral')),
+      },
+      accordFamily: val('aAccord'),
+      season: val('aSeason'),
+      occasion: parseNoteInput(val('aOccasion')),
+      rating: num('aRating'),
+      longevity: null,
+      sillage: val('aSillage'),
+      wearFrequency: '',
+      rebuy: val('aRebuy'),
+      comments: val('aComments'),
+    };
+    const jsonText = JSON.stringify(obj, null, 2) + ',';
+    document.getElementById('addResult').innerHTML = `
+      <div class="result-box">
+        <p class="result-headline">Ready to paste</p>
+        <p class="result-sub">Copy this, then on GitHub open data.json, paste it right before the last perfume entry (or right after the opening "perfumes": [ if it's your first).</p>
+        <div class="json-output" id="jsonOutput">${jsonText.replace(/</g,'&lt;')}</div>
+        <button class="copy-btn" id="copyBtn">Copy JSON</button>
+      </div>
+    `;
+    document.getElementById('copyBtn').addEventListener('click', () => {
+      navigator.clipboard.writeText(jsonText).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy JSON', 1500);
+      });
+    });
+  });
 }

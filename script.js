@@ -39,6 +39,7 @@ function render(data){
   populateFilters(perfumes);
   renderGrid(perfumes);
   setupPredictor(perfumes);
+  setupTodayPick(perfumes);
   setupAddForm(perfumes);
   setupCardFlip();
 
@@ -637,6 +638,74 @@ function setupPredictor(perfumes){
         </div>
         <p class="result-sub" style="margin-top:16px">Closest matches in your collection:</p>
         <div class="match-list">${matchRows}</div>
+      </div>
+    `;
+  });
+}
+
+/* ---------- Today's Pick ---------- */
+function setupTodayPick(perfumes){
+  const occSel = document.getElementById('tOccasion');
+  [...new Set(perfumes.flatMap(p => p.occasion || []))].sort().forEach(o =>
+    occSel.insertAdjacentHTML('beforeend', `<option value="${o}">${o}</option>`)
+  );
+
+  document.getElementById('todayForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const weather = document.getElementById('tWeather').value;
+    const occasion = document.getElementById('tOccasion').value;
+
+    // Tiered matching: exact season+occasion, then season-only, then occasion-only, then anything.
+    let matches = perfumes.filter(p => p.season === weather && (!occasion || (p.occasion||[]).includes(occasion)));
+    let tier = 'exact';
+    if (!matches.length){
+      matches = perfumes.filter(p => p.season === weather || p.season === 'All-Season');
+      tier = 'season';
+    }
+    if (!matches.length && occasion){
+      matches = perfumes.filter(p => (p.occasion||[]).includes(occasion));
+      tier = 'occasion';
+    }
+    if (!matches.length){
+      matches = perfumes.slice();
+      tier = 'none';
+    }
+    matches = matches.slice().sort((a,b) => (b.rating||0) - (a.rating||0));
+    const top = matches[0];
+    const alternates = matches.slice(1, 3);
+
+    // See if a precomputed layering pair involves today's top pick.
+    const layering = computeLayeringSuggestions(perfumes)
+      .find(s => s.A.id === top.id || s.B.id === top.id);
+
+    const tierNote = {
+      exact: '',
+      season: `No exact match for ${weather.split('/')[0]} + ${occasion || 'that occasion'} — widened to anything that fits the weather. This is a coverage gap worth knowing about.`,
+      occasion: `Nothing tagged for that weather — matched on occasion only instead.`,
+      none: `Nothing tagged for that combo at all yet — showing your highest-rated bottle overall.`
+    }[tier];
+
+    const altHtml = alternates.length ? `
+      <p class="result-sub" style="margin-top:14px">Other options:</p>
+      <div class="match-list">${alternates.map(p =>
+        `<div class="match-row"><span>${p.name} (${p.brand})</span><span class="match-sim">${p.rating != null ? p.rating + '★' : ''}</span></div>`
+      ).join('')}</div>` : '';
+
+    const layerHtml = layering ? `
+      <div class="gap-flag fills" style="margin-top:14px">
+        Feeling like layering? Try it with <strong>${layering.A.id === top.id ? layering.B.name : layering.A.name}</strong> — they share ${(layering.sharedBase.length ? layering.sharedBase : layering.sharedAny).slice(0,2).join(', ')}.
+      </div>` : '';
+
+    document.getElementById('todayResult').innerHTML = `
+      <div class="result-box">
+        <p class="result-headline">${top.name}</p>
+        <p class="result-sub">${top.brand} · ${top.rating != null ? top.rating + '★' : 'unrated'}${tierNote ? ' — ' + tierNote : ''}</p>
+        ${noteRow('Top', top.notes?.top, 'top')}
+        ${noteRow('Heart', top.notes?.mid, 'mid')}
+        ${noteRow('Base', top.notes?.base, 'base')}
+        ${noteRow('Notes', top.notes?.general, 'general')}
+        ${layerHtml}
+        ${altHtml}
       </div>
     `;
   });

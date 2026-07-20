@@ -71,6 +71,30 @@
 
   <section class="panel predictor-panel">
     <div class="panel-head">
+      <h2>Today's Pick</h2>
+      <p class="panel-sub">Tell it the weather and where you're headed — it picks from what you actually own.</p>
+    </div>
+    <form id="todayForm" class="entry-form">
+      <div class="form-row">
+        <label>Weather
+          <select id="tWeather">
+            <option value="Day/Summer">Hot / Sunny</option>
+            <option value="Rainy/Fresh">Rainy / Humid</option>
+            <option value="Night/Winter">Cool / Evening</option>
+            <option value="All-Season">Not sure / Mild</option>
+          </select>
+        </label>
+        <label>Occasion
+          <select id="tOccasion"><option value="">Any</option></select>
+        </label>
+      </div>
+      <button type="submit" class="btn-primary">What Should I Wear?</button>
+    </form>
+    <div id="todayResult"></div>
+  </section>
+
+  <section class="panel predictor-panel">
+    <div class="panel-head">
       <h2>Match Predictor</h2>
       <p class="panel-sub">Thinking of buying something? Enter its notes and see how it stacks up against what you own.</p>
     </div>

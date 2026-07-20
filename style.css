@@ -227,10 +227,41 @@ main{max-width:1000px; margin:0 auto; padding:56px 24px 80px;}
 }
 
 /* ---------- Bar / scatter charts ---------- */
-#brandChart, #rebuyChart, #priceChart{ width:100%; height:auto; display:block; }
+#brandChart, #rebuyChart, #priceChart, #mapChart{ width:100%; height:auto; display:block; }
 .bar-label{ font-family:var(--mono); font-size:10px; fill:var(--ink); }
 .bar-value{ font-family:var(--mono); font-size:10px; fill:rgba(56,42,30,0.55); }
 .axis-line{ stroke:var(--line); stroke-width:1; }
+
+/* ---------- Layering suggestions ---------- */
+.layer-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(260px,1fr));
+  gap:16px;
+}
+.layer-card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:18px 20px;
+}
+.layer-pair{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-family:var(--display);
+  font-size:16px;
+  margin-bottom:10px;
+  flex-wrap:wrap;
+}
+.layer-pair .plus{ color:var(--amber); font-size:14px; }
+.layer-reasons{
+  margin:0;
+  padding-left:18px;
+  font-size:12.5px;
+  color:rgba(56,42,30,0.7);
+  line-height:1.5;
+}
+.layer-reasons li{ margin-bottom:4px; }
 
 /* ---------- Gap table ---------- */
 table{ width:100%; border-collapse:collapse; font-size:13px; background:var(--card); border-radius:10px; overflow:hidden;}

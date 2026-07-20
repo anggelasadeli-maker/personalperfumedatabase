@@ -56,12 +56,12 @@ function currentFilters(){
   };
 }
 
-/* ---------- Accord wheel (donut, split on "/") ---------- */
+/* ---------- Accord wheel (donut, split on "/" or ",") ---------- */
 function renderAccordWheel(perfumes){
   const counts = {};
   perfumes.forEach(p => {
     const fam = p.accordFamily || '';
-    const tokens = fam.split('/').map(t => t.trim()).filter(Boolean);
+    const tokens = fam.split(/[/,]/).map(t => t.trim()).filter(Boolean);
     if (!tokens.length){ counts['Unclassified'] = (counts['Unclassified'] || 0) + 1; return; }
     tokens.forEach(t => { counts[t] = (counts[t] || 0) + 1; });
   });
@@ -304,15 +304,24 @@ function topKEigen_(M, k=2){
   return results;
 }
 
+// Splits an Accord Family string on both "/" and "," since the sheet has a
+// mix of both delimiters, and normalizes casing for consistent grouping.
+function accordTokens(fam){
+  return (fam || '')
+    .split(/[/,]/)
+    .map(t => t.trim().toLowerCase())
+    .filter(Boolean);
+}
+
 function computePCA(perfumes){
-  const noteLists = perfumes.map(p => [...new Set(allNotes(p).map(normalizeNote).filter(Boolean))]);
+  const famLists = perfumes.map(p => [...new Set(accordTokens(p.accordFamily))]);
   const vocabSet = new Set();
-  noteLists.forEach(list => list.forEach(n => vocabSet.add(n)));
+  famLists.forEach(list => list.forEach(f => vocabSet.add(f)));
   const vocab = [...vocabSet];
   const n = perfumes.length;
   if (vocab.length < 3 || n < 4) return null;
 
-  let X = noteLists.map(list => vocab.map(v => list.includes(v) ? 1 : 0));
+  let X = famLists.map(list => vocab.map(v => list.includes(v) ? 1 : 0));
   const means = vocab.map((_, j) => X.reduce((s, row) => s + row[j], 0) / n);
   X = X.map(row => row.map((val, j) => val - means[j]));
 
@@ -327,13 +336,13 @@ function computePCA(perfumes){
   };
   const xs = scoreFor(0), ys = scoreFor(1);
 
-  // axis labels: notes with the strongest positive/negative loading on each component
+  // axis labels: accord families with the strongest positive/negative loading on each component
   const loadingsFor = (k) => {
     const { vector, value } = eig[k];
     if (value <= 0) return null;
     const scale = 1 / Math.sqrt(value);
-    return vocab.map((note, j) => ({
-      note,
+    return vocab.map((fam, j) => ({
+      fam,
       w: X.reduce((s, row, i) => s + row[j] * vector[i], 0) * scale
     }));
   };
@@ -341,7 +350,7 @@ function computePCA(perfumes){
     const loadings = loadingsFor(k);
     if (!loadings) return '';
     const sorted = loadings.slice().sort((a,b) => b.w - a.w);
-    const pos = sorted[0]?.note, neg = sorted[sorted.length-1]?.note;
+    const pos = sorted[0]?.fam, neg = sorted[sorted.length-1]?.fam;
     return (neg || '?') + '  \u2194  ' + (pos || '?');
   };
 
@@ -372,7 +381,7 @@ function renderCollectionMap(perfumes){
   svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
 
   const colorFor = fam => {
-    const key = (fam || '').split('/')[0].trim() || 'Unclassified';
+    const key = accordTokens(fam)[0] || 'unclassified';
     let hash = 0;
     for (const ch of key) hash = (hash * 31 + ch.charCodeAt(0)) % PALETTE.length;
     return PALETTE[hash];
@@ -594,7 +603,7 @@ function setupPredictor(perfumes){
     top.forEach(({p, sim}) => {
       if (p.season) seasonVotes[p.season] = (seasonVotes[p.season]||0) + sim;
       (p.occasion||[]).forEach(o => occVotes[o] = (occVotes[o]||0) + sim);
-      (p.accordFamily||'').split('/').map(s=>s.trim()).filter(Boolean).forEach(a => accordVotes[a] = (accordVotes[a]||0) + sim);
+      (p.accordFamily||'').split(/[/,]/).map(s=>s.trim()).filter(Boolean).forEach(a => accordVotes[a] = (accordVotes[a]||0) + sim);
     });
     const bestOf = obj => Object.entries(obj).sort((a,b)=>b[1]-a[1])[0]?.[0] || '—';
     const predSeason = bestOf(seasonVotes);

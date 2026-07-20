@@ -6,7 +6,6 @@ const REBUY_COLORS = { "Yes": "#7C8B6F", "Maybe": "#C08A3E", "No": "#A85C6B" };
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxpYlA3puA2iQ-rsJavvYbivTx1dO8SgvtqXXE7dGOLMh-Ugvdda3cfR9-dDJwtJSo3-A/exec";
 const WRITE_SECRET = "perfumesecret"; // must match SECRET in apps-script.gs
 
-
 const USING_LIVE_SHEET = SHEET_API_URL && !SHEET_API_URL.startsWith("PASTE_");
 
 function loadData(){
@@ -35,6 +34,8 @@ function render(data){
   renderRebuyChart(perfumes);
   renderPriceChart(perfumes);
   renderGapTable(perfumes);
+  renderLayeringSuggestions(perfumes);
+  renderCollectionMap(perfumes);
   populateFilters(perfumes);
   renderGrid(perfumes);
   setupPredictor(perfumes);
@@ -215,6 +216,182 @@ function renderGapTable(perfumes){
   el.innerHTML = html;
 }
 
+/* ---------- Layering Suggestions ---------- */
+function findSharedNotes(listA, listB){
+  const normA = [...new Set(listA.map(normalizeNote).filter(Boolean))];
+  const normB = [...new Set(listB.map(normalizeNote).filter(Boolean))];
+  const shared = [];
+  normA.forEach(a => { if (normB.some(b => notesMatch(a, b))) shared.push(a); });
+  return shared;
+}
+
+function computeLayeringSuggestions(perfumes){
+  const pairs = [];
+  for (let i = 0; i < perfumes.length; i++){
+    for (let j = i + 1; j < perfumes.length; j++){
+      const A = perfumes[i], B = perfumes[j];
+      const notesA = allNotes(A), notesB = allNotes(B);
+      const overallSim = noteSimilarity(notesA, notesB);
+      const baseSim = noteSimilarity(A.notes?.base || [], B.notes?.base || []);
+      const sharedBase = findSharedNotes(A.notes?.base || [], B.notes?.base || []);
+      const sharedAny = findSharedNotes(notesA, notesB);
+      pairs.push({ A, B, overallSim, baseSim, sharedBase, sharedAny });
+    }
+  }
+  // Sweet spot: enough shared ground to blend, not so much it's a near-duplicate
+  const candidates = pairs.filter(p => p.overallSim > 0.04 && p.overallSim < 0.45);
+  candidates.sort((a, b) => (b.baseSim * 2 + b.overallSim) - (a.baseSim * 2 + a.overallSim));
+  return candidates.slice(0, 6);
+}
+
+function renderLayeringSuggestions(perfumes){
+  const el = document.getElementById('layeringResult');
+  const suggestions = computeLayeringSuggestions(perfumes);
+
+  if (!suggestions.length){
+    el.innerHTML = '<p style="color:rgba(56,42,30,0.5)">Not enough note overlap across your collection yet to suggest pairings.</p>';
+    return;
+  }
+
+  el.innerHTML = `<div class="layer-grid">${suggestions.map(s => {
+    const bothHeavy = s.A.sillage === 'Heavy' && s.B.sillage === 'Heavy';
+    const reasons = [];
+    if (s.sharedBase.length){
+      reasons.push(`Share ${s.sharedBase.slice(0,3).join(', ')} in the base — layering should deepen and extend that.`);
+    } else if (s.sharedAny.length){
+      reasons.push(`Share ${s.sharedAny.slice(0,3).join(', ')} — enough common ground to blend rather than clash.`);
+    }
+    const famA = (s.A.accordFamily||'').trim(), famB = (s.B.accordFamily||'').trim();
+    if (famA && famB && famA !== famB){
+      reasons.push(`Different accords (${famA} vs ${famB}) add complexity instead of just doubling up.`);
+    }
+    if (bothHeavy) reasons.push('Both wear heavy — this will be bold, layer sparingly.');
+    if (!reasons.length) reasons.push('Light overlap — worth a test spray before committing to a full wear.');
+    return `
+      <div class="layer-card">
+        <div class="layer-pair"><span>${s.A.name}</span><span class="plus">+</span><span>${s.B.name}</span></div>
+        <ul class="layer-reasons">${reasons.map(r => `<li>${r}</li>`).join('')}</ul>
+      </div>
+    `;
+  }).join('')}</div>`;
+}
+
+/* ---------- Collection Map (real PCA, computed client-side) ---------- */
+function dot_(a, b){ return a.reduce((s,x,i) => s + x*b[i], 0); }
+function matVec_(M, v){ return M.map(row => dot_(row, v)); }
+function vecNorm_(v){ return Math.sqrt(dot_(v,v)); }
+function normalizeVec_(v){ const n = vecNorm_(v) || 1; return v.map(x => x/n); }
+
+function powerIteration_(M, iterations=250){
+  const n = M.length;
+  let v = normalizeVec_(Array.from({length:n}, () => Math.random() - 0.5));
+  for (let it = 0; it < iterations; it++) v = normalizeVec_(matVec_(M, v));
+  const Mv = matVec_(M, v);
+  return { vector: v, value: dot_(v, Mv) };
+}
+
+function topKEigen_(M, k=2){
+  const n = M.length;
+  let cur = M.map(row => row.slice());
+  const results = [];
+  for (let c = 0; c < k; c++){
+    const { vector, value } = powerIteration_(cur);
+    results.push({ vector, value });
+    for (let i = 0; i < n; i++)
+      for (let j = 0; j < n; j++)
+        cur[i][j] -= value * vector[i] * vector[j];
+  }
+  return results;
+}
+
+function computePCA(perfumes){
+  const noteLists = perfumes.map(p => [...new Set(allNotes(p).map(normalizeNote).filter(Boolean))]);
+  const vocabSet = new Set();
+  noteLists.forEach(list => list.forEach(n => vocabSet.add(n)));
+  const vocab = [...vocabSet];
+  const n = perfumes.length;
+  if (vocab.length < 3 || n < 4) return null;
+
+  let X = noteLists.map(list => vocab.map(v => list.includes(v) ? 1 : 0));
+  const means = vocab.map((_, j) => X.reduce((s, row) => s + row[j], 0) / n);
+  X = X.map(row => row.map((val, j) => val - means[j]));
+
+  const G = X.map((rowI) => X.map((rowJ) => dot_(rowI, rowJ)));
+  const eig = topKEigen_(G, 2);
+
+  const scoreFor = (k) => {
+    const { vector, value } = eig[k];
+    if (value <= 0) return perfumes.map(() => 0);
+    const scale = Math.sqrt(value);
+    return vector.map(u => u * scale);
+  };
+  const xs = scoreFor(0), ys = scoreFor(1);
+
+  // axis labels: notes with the strongest positive/negative loading on each component
+  const loadingsFor = (k) => {
+    const { vector, value } = eig[k];
+    if (value <= 0) return null;
+    const scale = 1 / Math.sqrt(value);
+    return vocab.map((note, j) => ({
+      note,
+      w: X.reduce((s, row, i) => s + row[j] * vector[i], 0) * scale
+    }));
+  };
+  const axisLabel = (k) => {
+    const loadings = loadingsFor(k);
+    if (!loadings) return '';
+    const sorted = loadings.slice().sort((a,b) => b.w - a.w);
+    const pos = sorted[0]?.note, neg = sorted[sorted.length-1]?.note;
+    return (neg || '?') + '  \u2194  ' + (pos || '?');
+  };
+
+  return {
+    points: perfumes.map((p, i) => ({ name: p.name, brand: p.brand, accordFamily: p.accordFamily, x: xs[i], y: ys[i] })),
+    xLabel: axisLabel(0),
+    yLabel: axisLabel(1)
+  };
+}
+
+function renderCollectionMap(perfumes){
+  const svg = document.getElementById('mapChart');
+  const result = computePCA(perfumes);
+  if (!result){
+    svg.outerHTML = '<p style="color:rgba(56,42,30,0.5)">Not enough note data yet to map the collection — add more bottles or notes first.</p>';
+    return;
+  }
+  const { points, xLabel, yLabel } = result;
+
+  const width = 700, height = 500, pad = 70;
+  const xs = points.map(p => p.x), ys = points.map(p => p.y);
+  const xMin = Math.min(...xs), xMax = Math.max(...xs);
+  const yMin = Math.min(...ys), yMax = Math.max(...ys);
+  const xSpan = (xMax - xMin) || 1, ySpan = (yMax - yMin) || 1;
+  const xOf = x => pad + ((x - xMin) / xSpan) * (width - 2*pad);
+  const yOf = y => height - pad - ((y - yMin) / ySpan) * (height - 2*pad);
+
+  svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+
+  const colorFor = fam => {
+    const key = (fam || '').split('/')[0].trim() || 'Unclassified';
+    let hash = 0;
+    for (const ch of key) hash = (hash * 31 + ch.charCodeAt(0)) % PALETTE.length;
+    return PALETTE[hash];
+  };
+
+  let html = `
+    <line x1="${pad}" y1="${(pad + height - pad)/2}" x2="${width-pad}" y2="${(pad+height-pad)/2}" class="axis-line" opacity="0.35"></line>
+    <line x1="${width/2}" y1="${pad}" x2="${width/2}" y2="${height-pad}" class="axis-line" opacity="0.35"></line>
+    <text x="${width/2}" y="${height-20}" text-anchor="middle" class="bar-label">${xLabel}</text>
+    <text x="20" y="${height/2}" text-anchor="middle" class="bar-label" transform="rotate(-90 20 ${height/2})">${yLabel}</text>
+  `;
+  points.forEach(p => {
+    const cx = xOf(p.x), cy = yOf(p.y);
+    html += `<circle cx="${cx}" cy="${cy}" r="6" fill="${colorFor(p.accordFamily)}" opacity="0.85"><title>${p.name} (${p.brand})</title></circle>`;
+    html += `<text x="${cx}" y="${cy - 10}" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#382A1E">${p.name}</text>`;
+  });
+  svg.innerHTML = html;
+}
+
 /* ---------- Filters ---------- */
 function purchaseYear(p){
   const d = p.purchaseDate;
@@ -321,13 +498,53 @@ function allNotes(p){
     .map(s => s.toLowerCase());
 }
 
-function jaccard(a, b){
-  const setA = new Set(a), setB = new Set(b);
-  if (!setA.size || !setB.size) return 0;
-  let inter = 0;
-  setA.forEach(x => { if (setB.has(x)) inter++; });
-  const union = new Set([...setA, ...setB]).size;
-  return inter / union;
+// Strips extraction-method qualifiers (EO, absolute, extract...) and normalizes
+// spelling variants (hyphens, plurals) so "Vanilla Absolute" and "vanillas" both
+// reduce to the same core note as plain "Vanilla".
+const NOTE_QUALIFIERS = ['essential oil','co2 extract','absolute','extract','resinoid','tincture',' eo\\b','\\boil\\b'];
+const NON_PLURAL_S_NOTES = ['iris','cassis','citrus','anise','narcissus','osmanthus','hibiscus','sassafras','molasses','chypre'];
+function normalizeNote(s){
+  let n = (s || '').toLowerCase().trim().replace(/-/g, ' ').replace(/\s+/g, ' ');
+  NOTE_QUALIFIERS.forEach(q => { n = n.replace(new RegExp('\\b' + q, 'g'), ''); });
+  n = n.replace(/\s+/g, ' ').trim();
+  const tokens = n.split(' ');
+  const lastWord = tokens[tokens.length - 1];
+  if (!NON_PLURAL_S_NOTES.includes(lastWord)){
+    if (n.endsWith('sses')) n = n.slice(0, -2);           // grasses -> grass
+    else if (n.length > 3 && n.endsWith('s') && !n.endsWith('ss')) n = n.slice(0, -1);
+  }
+  return n;
+}
+
+// Two normalized notes match if identical, if one is a whole word inside the
+// other's space-separated words (e.g. "lemon" in "sicilian lemon"), or if
+// they're the same fused compound (e.g. "cedar"/"cedarwood", "moss"/"oakmoss").
+// Deliberately NOT generic substring matching — that catches false friends
+// like "tea"/"teakwood" or "rose"/"rosemary".
+function notesMatch(a, b){
+  if (!a || !b || a.length < 3 || b.length < 3) return false;
+  if (a === b) return true;
+  const shorter = a.length <= b.length ? a : b;
+  const longer = a.length <= b.length ? b : a;
+  if (longer.split(' ').includes(shorter)) return true;
+  if (longer === shorter + 'wood') return true;
+  if (shorter.length >= 4 && !longer.includes(' ') && longer.endsWith(shorter)) return true;
+  return false;
+}
+
+// Similarity between two note lists: fuzzy/containment-matched intersection over union.
+function noteSimilarity(listA, listB){
+  const normA = [...new Set(listA.map(normalizeNote).filter(Boolean))];
+  const normB = [...new Set(listB.map(normalizeNote).filter(Boolean))];
+  if (!normA.length || !normB.length) return 0;
+  const usedB = new Set();
+  let matches = 0;
+  normA.forEach(a => {
+    const idx = normB.findIndex((b, i) => !usedB.has(i) && notesMatch(a, b));
+    if (idx !== -1){ matches++; usedB.add(idx); }
+  });
+  const union = normA.length + normB.length - matches;
+  return union > 0 ? matches / union : 0;
 }
 
 /* ---------- Match Predictor ---------- */
@@ -352,7 +569,7 @@ function setupPredictor(perfumes){
     }
 
     const scored = perfumes
-      .map(p => ({ p, sim: jaccard(candidateNotes, allNotes(p)) }))
+      .map(p => ({ p, sim: noteSimilarity(candidateNotes, allNotes(p)) }))
       .filter(x => x.sim > 0)
       .sort((a,b) => b.sim - a.sim);
 
@@ -421,6 +638,7 @@ function setupAddForm(perfumes){
   document.getElementById('addFormSub').textContent = USING_LIVE_SHEET
     ? 'Fill this in for a bottle you actually own — it saves straight to your Google Sheet.'
     : 'Fill this in for a bottle you actually own — it generates the JSON block to paste into data.json on GitHub.';
+  document.getElementById('addFormBtn').textContent = USING_LIVE_SHEET ? 'Save to Sheet' : 'Generate JSON Block';
 
   document.getElementById('addForm').addEventListener('submit', e => {
     e.preventDefault();

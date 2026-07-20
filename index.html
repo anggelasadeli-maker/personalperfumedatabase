@@ -138,7 +138,7 @@
         </label>
       </div>
       <label>Comments<textarea id="aComments" rows="2"></textarea></label>
-      <button type="submit" class="btn-primary">Generate JSON Block</button>
+      <button type="submit" class="btn-primary" id="addFormBtn">Generate JSON Block</button>
     </form>
     <div id="addResult"></div>
   </section>
@@ -165,9 +165,26 @@
     <div id="gapTable"></div>
   </section>
 
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Layering Suggestions</h2>
+      <p class="panel-sub">Pairs from your own collection worth trying together, based on shared and complementary notes — not guessed sensory effects, just what the note data actually supports.</p>
+    </div>
+    <div id="layeringResult"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Collection Map</h2>
+      <p class="panel-sub">Every bottle plotted by note similarity (real PCA over your note data, computed in-browser) — closer points smell more alike.</p>
+    </div>
+    <svg id="mapChart" viewBox="0 0 700 500"></svg>
+  </section>
+
 </main>
 
 <footer>
+
   <p>Data lives in <code>data.json</code> — edit it, commit, push. The page reads straight from it.</p>
 </footer>
 

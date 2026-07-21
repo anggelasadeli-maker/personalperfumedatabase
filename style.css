@@ -284,6 +284,34 @@ main{max-width:1000px; margin:0 auto; padding:56px 24px 80px;}
 }
 .layer-empty{ font-style:italic; color:rgba(56,42,30,0.45); }
 
+/* ---------- Today's Pick slideshow ---------- */
+.slide{ display:none; }
+.slide.active{ display:block; }
+.slide-nav{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:20px;
+  padding-top:16px;
+  border-top:1px dashed var(--line);
+}
+.slide-btn{
+  background:none;
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:8px 16px;
+  font-family:var(--body);
+  font-size:12px;
+  color:var(--ink);
+  cursor:pointer;
+}
+.slide-btn:hover{ background:rgba(56,42,30,0.05); }
+.slide-indicator{
+  font-family:var(--mono);
+  font-size:12px;
+  color:rgba(56,42,30,0.5);
+}
+
 /* ---------- Gap table ---------- */
 table{ width:100%; border-collapse:collapse; font-size:13px; background:var(--card); border-radius:10px; overflow:hidden;}
 th,td{ padding:12px 14px; text-align:center; border:1px solid var(--line);}

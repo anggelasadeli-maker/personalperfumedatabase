@@ -121,6 +121,40 @@
 
   <section class="panel">
     <div class="panel-head">
+      <h2>Collection</h2>
+      <p class="panel-sub"><span id="perfumeCount">0</span> bottles logged</p>
+    </div>
+    <div class="filters">
+      <select id="brandFilter"><option value="">All brands</option></select>
+      <select id="yearFilter"><option value="">All years</option></select>
+      <select id="seasonFilter"><option value="">All seasons</option></select>
+      <select id="occasionFilter"><option value="">All occasions</option></select>
+    </div>
+    <div class="grid" id="collectionGrid"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Coverage Gaps</h2>
+      <p class="panel-sub">Season × occasion — empty cells are where you're under-stocked</p>
+    </div>
+    <div id="gapTable"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Collection Map</h2>
+      <p class="panel-sub">Every bottle plotted by accord family — closer points smell more alike. Default axes are auto-computed (PCA); pick specific families instead if you want a direct comparison.</p>
+    </div>
+    <div class="filters">
+      <select id="mapXAxis"><option value="pca">X: Auto (PCA)</option></select>
+      <select id="mapYAxis"><option value="pca">Y: Auto (PCA)</option></select>
+    </div>
+    <svg id="mapChart" viewBox="0 0 700 500"></svg>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
       <h2>Add a Bottle</h2>
       <p class="panel-sub" id="addFormSub">Fill this in for a bottle you actually own.</p>
     </div>
@@ -165,44 +199,6 @@
       <button type="submit" class="btn-primary" id="addFormBtn">Generate JSON Block</button>
     </form>
     <div id="addResult"></div>
-  </section>
-
-  <section class="panel">
-    <div class="panel-head">
-      <h2>Collection</h2>
-      <p class="panel-sub"><span id="perfumeCount">0</span> bottles logged</p>
-    </div>
-    <div class="filters">
-      <select id="brandFilter"><option value="">All brands</option></select>
-      <select id="yearFilter"><option value="">All years</option></select>
-      <select id="seasonFilter"><option value="">All seasons</option></select>
-      <select id="occasionFilter"><option value="">All occasions</option></select>
-    </div>
-    <div class="grid" id="collectionGrid"></div>
-  </section>
-
-  <section class="panel">
-    <div class="panel-head">
-      <h2>Coverage Gaps</h2>
-      <p class="panel-sub">Season × occasion — empty cells are where you're under-stocked</p>
-    </div>
-    <div id="gapTable"></div>
-  </section>
-
-  <section class="panel">
-    <div class="panel-head">
-      <h2>Layering Suggestions</h2>
-      <p class="panel-sub">Pairs from your own collection worth trying together, based on shared and complementary notes — not guessed sensory effects, just what the note data actually supports.</p>
-    </div>
-    <div id="layeringResult"></div>
-  </section>
-
-  <section class="panel">
-    <div class="panel-head">
-      <h2>Collection Map</h2>
-      <p class="panel-sub">Every bottle plotted by note similarity (real PCA over your note data, computed in-browser) — closer points smell more alike.</p>
-    </div>
-    <svg id="mapChart" viewBox="0 0 700 500"></svg>
   </section>
 
 </main>

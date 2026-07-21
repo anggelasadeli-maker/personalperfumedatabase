@@ -552,6 +552,7 @@ function setupPredictor(perfumes){
     const price = parseFloat(document.getElementById('pPrice').value) || null;
     const size = parseFloat(document.getElementById('pSize').value) || null;
     const name = document.getElementById('pName').value || 'This perfume';
+    const brand = document.getElementById('pBrand').value;
     const pricePerMl = (price && size) ? price / size : null;
 
     if (!candidateNotes.length){
@@ -570,7 +571,7 @@ function setupPredictor(perfumes){
     if (!top.length){
       document.getElementById('predictorResult').innerHTML = `
         <div class="result-box">
-          <p class="result-headline">No real overlap found</p>
+          <p class="result-headline">${name}${brand ? ' — ' + brand : ''}: no real overlap found</p>
           <p class="result-sub">None of your notes match anything you already own — this would be a genuinely new direction, not a data point I can predict from.</p>
           ${pricePerMl ? `<div class="stat-grid"><div class="stat-box"><div class="stat-label">Price / ml</div><div class="stat-value">Rp${Math.round(pricePerMl).toLocaleString('id-ID')}</div></div></div>` : ''}
         </div>`;
@@ -603,7 +604,7 @@ function setupPredictor(perfumes){
 
     document.getElementById('predictorResult').innerHTML = `
       <div class="result-box">
-        <p class="result-headline">${name}</p>
+        <p class="result-headline">${name}${brand ? ' — ' + brand : ''}</p>
         <p class="result-sub">Predicted from ${top.length} note-similar bottle${top.length>1?'s':''} in your collection</p>
         <div class="stat-grid">
           <div class="stat-box"><div class="stat-label">Predicted Rating</div><div class="stat-value">${predictedRating.toFixed(1)} ★</div></div>

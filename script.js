@@ -34,8 +34,8 @@ function render(data){
   renderRebuyChart(perfumes);
   renderPriceChart(perfumes);
   renderGapTable(perfumes);
-  renderLayeringSuggestions(perfumes);
   renderCollectionMap(perfumes);
+  setupMapControls(perfumes);
   populateFilters(perfumes);
   renderGrid(perfumes);
   setupPredictor(perfumes);
@@ -226,57 +226,6 @@ function findSharedNotes(listA, listB){
   return shared;
 }
 
-function computeLayeringSuggestions(perfumes){
-  const pairs = [];
-  for (let i = 0; i < perfumes.length; i++){
-    for (let j = i + 1; j < perfumes.length; j++){
-      const A = perfumes[i], B = perfumes[j];
-      const notesA = allNotes(A), notesB = allNotes(B);
-      const overallSim = noteSimilarity(notesA, notesB);
-      const baseSim = noteSimilarity(A.notes?.base || [], B.notes?.base || []);
-      const sharedBase = findSharedNotes(A.notes?.base || [], B.notes?.base || []);
-      const sharedAny = findSharedNotes(notesA, notesB);
-      pairs.push({ A, B, overallSim, baseSim, sharedBase, sharedAny });
-    }
-  }
-  // Sweet spot: enough shared ground to blend, not so much it's a near-duplicate
-  const candidates = pairs.filter(p => p.overallSim > 0.04 && p.overallSim < 0.45);
-  candidates.sort((a, b) => (b.baseSim * 2 + b.overallSim) - (a.baseSim * 2 + a.overallSim));
-  return candidates.slice(0, 6);
-}
-
-function renderLayeringSuggestions(perfumes){
-  const el = document.getElementById('layeringResult');
-  const suggestions = computeLayeringSuggestions(perfumes);
-
-  if (!suggestions.length){
-    el.innerHTML = '<p style="color:rgba(56,42,30,0.5)">Not enough note overlap across your collection yet to suggest pairings.</p>';
-    return;
-  }
-
-  el.innerHTML = `<div class="layer-grid">${suggestions.map(s => {
-    const bothHeavy = s.A.sillage === 'Heavy' && s.B.sillage === 'Heavy';
-    const reasons = [];
-    if (s.sharedBase.length){
-      reasons.push(`Share ${s.sharedBase.slice(0,3).join(', ')} in the base — layering should deepen and extend that.`);
-    } else if (s.sharedAny.length){
-      reasons.push(`Share ${s.sharedAny.slice(0,3).join(', ')} — enough common ground to blend rather than clash.`);
-    }
-    const famA = (s.A.accordFamily||'').trim(), famB = (s.B.accordFamily||'').trim();
-    if (famA && famB && famA !== famB){
-      reasons.push(`Different accords (${famA} vs ${famB}) add complexity instead of just doubling up.`);
-    }
-    if (bothHeavy) reasons.push('Both wear heavy — this will be bold, layer sparingly.');
-    if (!reasons.length) reasons.push('Light overlap — worth a test spray before committing to a full wear.');
-    return `
-      <div class="layer-card">
-        <div class="layer-pair"><span>${s.A.name}</span><span class="plus">+</span><span>${s.B.name}</span></div>
-        <ul class="layer-reasons">${reasons.map(r => `<li>${r}</li>`).join('')}</ul>
-      </div>
-    `;
-  }).join('')}</div>`;
-}
-
 /* ---------- Collection Map (real PCA, computed client-side) ---------- */
 function dot_(a, b){ return a.reduce((s,x,i) => s + x*b[i], 0); }
 function matVec_(M, v){ return M.map(row => dot_(row, v)); }
@@ -314,11 +263,14 @@ function accordTokens(fam){
     .filter(Boolean);
 }
 
-function computePCA(perfumes){
+function buildAccordFeatures(perfumes){
   const famLists = perfumes.map(p => [...new Set(accordTokens(p.accordFamily))]);
   const vocabSet = new Set();
   famLists.forEach(list => list.forEach(f => vocabSet.add(f)));
-  const vocab = [...vocabSet];
+  return { famLists, vocab: [...vocabSet].sort() };
+}
+
+function computePCAScores(perfumes, famLists, vocab){
   const n = perfumes.length;
   if (vocab.length < 3 || n < 4) return null;
 
@@ -355,24 +307,41 @@ function computePCA(perfumes){
     return (neg || '?') + '  \u2194  ' + (pos || '?');
   };
 
-  return {
-    points: perfumes.map((p, i) => ({ name: p.name, brand: p.brand, accordFamily: p.accordFamily, x: xs[i], y: ys[i] })),
-    xLabel: axisLabel(0),
-    yLabel: axisLabel(1)
-  };
+  return { xs, ys, xLabel: axisLabel(0), yLabel: axisLabel(1) };
 }
 
-function renderCollectionMap(perfumes){
+// Deterministic small jitter (based on perfume id, not random) so multiple
+// bottles sharing the same 0/1 value on a manually chosen axis don't stack
+// exactly on top of each other.
+function jitterFor(id, salt){
+  let hash = 0;
+  const s = id + salt;
+  for (const ch of s) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
+  return ((hash % 1000) / 1000 - 0.5) * 0.34;
+}
+
+function capitalize(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
+
+function renderCollectionMap(perfumes, xAxis='pca', yAxis='pca'){
   const svg = document.getElementById('mapChart');
-  const result = computePCA(perfumes);
-  if (!result){
-    svg.outerHTML = '<p style="color:rgba(56,42,30,0.5)">Not enough note data yet to map the collection — add more bottles or notes first.</p>';
+  const { famLists, vocab } = buildAccordFeatures(perfumes);
+
+  if (vocab.length < 3 || perfumes.length < 4){
+    svg.outerHTML = '<p style="color:rgba(56,42,30,0.5)">Not enough accord-family data yet to map the collection — tag more bottles first.</p>';
     return;
   }
-  const { points, xLabel, yLabel } = result;
+
+  const pca = computePCAScores(perfumes, famLists, vocab);
+  const valuesFor = (axisKey, salt) => {
+    if (axisKey === 'pca') return salt === 'x' ? pca.xs : pca.ys;
+    return perfumes.map((p, i) => (famLists[i].includes(axisKey) ? 1 : 0) + jitterFor(p.id, axisKey + salt));
+  };
+  const xs = valuesFor(xAxis, 'x');
+  const ys = valuesFor(yAxis, 'y');
+  const xLabel = xAxis === 'pca' ? pca.xLabel : `${capitalize(xAxis)} — has it (right) or not (left)`;
+  const yLabel = yAxis === 'pca' ? pca.yLabel : `${capitalize(yAxis)} — has it (top) or not (bottom)`;
 
   const width = 700, height = 500, pad = 70;
-  const xs = points.map(p => p.x), ys = points.map(p => p.y);
   const xMin = Math.min(...xs), xMax = Math.max(...xs);
   const yMin = Math.min(...ys), yMax = Math.max(...ys);
   const xSpan = (xMax - xMin) || 1, ySpan = (yMax - yMin) || 1;
@@ -394,12 +363,25 @@ function renderCollectionMap(perfumes){
     <text x="${width/2}" y="${height-20}" text-anchor="middle" class="bar-label">${xLabel}</text>
     <text x="20" y="${height/2}" text-anchor="middle" class="bar-label" transform="rotate(-90 20 ${height/2})">${yLabel}</text>
   `;
-  points.forEach(p => {
-    const cx = xOf(p.x), cy = yOf(p.y);
+  perfumes.forEach((p, i) => {
+    const cx = xOf(xs[i]), cy = yOf(ys[i]);
     html += `<circle cx="${cx}" cy="${cy}" r="6" fill="${colorFor(p.accordFamily)}" opacity="0.85"><title>${p.name} (${p.brand})</title></circle>`;
     html += `<text x="${cx}" y="${cy - 10}" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#382A1E">${p.name}</text>`;
   });
   svg.innerHTML = html;
+}
+
+function setupMapControls(perfumes){
+  const { vocab } = buildAccordFeatures(perfumes);
+  const xSel = document.getElementById('mapXAxis');
+  const ySel = document.getElementById('mapYAxis');
+  vocab.forEach(fam => {
+    xSel.insertAdjacentHTML('beforeend', `<option value="${fam}">X: ${capitalize(fam)}</option>`);
+    ySel.insertAdjacentHTML('beforeend', `<option value="${fam}">Y: ${capitalize(fam)}</option>`);
+  });
+  [xSel, ySel].forEach(sel => sel.addEventListener('change', () =>
+    renderCollectionMap(perfumes, xSel.value, ySel.value)
+  ));
 }
 
 /* ---------- Filters ---------- */
@@ -644,6 +626,105 @@ function setupPredictor(perfumes){
 }
 
 /* ---------- Today's Pick ---------- */
+/* ---------- Categorized layering for Today's Pick ---------- */
+const SWEET_CLUSTER = ['gourmand','sweet','vanilla','oriental','ambery','warm'];
+const FRESH_CLUSTER = ['fresh','green','aromatic','clean','tea'];
+
+function computeLayeringCategories(pick, perfumes){
+  const pickNotes = allNotes(pick);
+  const pickFams = new Set(accordTokens(pick.accordFamily));
+  const used = new Set([pick.id]);
+
+  const scored = perfumes
+    .filter(p => p.id !== pick.id)
+    .map(p => {
+      const notesP = allNotes(p);
+      const fams = new Set(accordTokens(p.accordFamily));
+      return {
+        p,
+        overallSim: noteSimilarity(pickNotes, notesP),
+        baseSim: noteSimilarity(pick.notes?.base || [], p.notes?.base || []),
+        sharedBase: findSharedNotes(pick.notes?.base || [], p.notes?.base || []),
+        sharedAny: findSharedNotes(pickNotes, notesP),
+        fams,
+        sharedFam: [...fams].some(f => pickFams.has(f)),
+        sweetHit: [...fams].filter(f => SWEET_CLUSTER.includes(f)),
+        freshHit: [...fams].filter(f => FRESH_CLUSTER.includes(f)),
+      };
+    });
+
+  function takeBest(pool, sortFn){
+    const avail = pool.filter(x => !used.has(x.p.id));
+    if (!avail.length) return null;
+    avail.sort(sortFn);
+    used.add(avail[0].p.id);
+    return avail[0];
+  }
+
+  const similar = takeBest(
+    scored.filter(x => x.overallSim >= 0.15 && x.overallSim <= 0.6),
+    (a,b) => (b.baseSim*2 + b.overallSim) - (a.baseSim*2 + a.overallSim)
+  );
+  const sweet = takeBest(
+    scored.filter(x => x.sweetHit.length),
+    (a,b) => (b.p.rating||0) - (a.p.rating||0) || b.overallSim - a.overallSim
+  );
+  const fresh = takeBest(
+    scored.filter(x => x.freshHit.length),
+    (a,b) => (b.p.rating||0) - (a.p.rating||0) || b.overallSim - a.overallSim
+  );
+  const explorative = takeBest(
+    scored.filter(x => x.overallSim < 0.03 && !x.sharedFam),
+    (a,b) => (b.p.rating||0) - (a.p.rating||0)
+  );
+
+  return { similar, sweet, fresh, explorative };
+}
+
+function layeringCategoryHtml(pick, categories){
+  const cards = [
+    {
+      key: 'similar', label: 'Similar Notes',
+      match: categories.similar,
+      reason: m => {
+        const shared = m.sharedBase.length ? m.sharedBase : m.sharedAny;
+        return shared.length
+          ? `Shares ${shared.slice(0,3).join(', ')} — will deepen and extend the scent rather than compete with it.`
+          : `Moderate overall note overlap — should blend without either one disappearing.`;
+      },
+      empty: 'Nothing close enough in your collection to reinforce this one without just duplicating it.'
+    },
+    {
+      key: 'sweet', label: 'Sweet Layering',
+      match: categories.sweet,
+      reason: m => `Tagged ${m.sweetHit.join('/')} — adds warmth ${pick.name} doesn't have on its own. You rated it ${m.p.rating ?? '—'}★.`,
+      empty: 'No sweet/gourmand/amber bottle in your collection to pair here.'
+    },
+    {
+      key: 'fresh', label: 'Fresher Layering',
+      match: categories.fresh,
+      reason: m => `Tagged ${m.freshHit.join('/')} — lightens things up on top. You rated it ${m.p.rating ?? '—'}★.`,
+      empty: 'No fresh/green/aromatic bottle in your collection to pair here.'
+    },
+    {
+      key: 'explorative', label: 'Explorative',
+      match: categories.explorative,
+      reason: m => `No shared notes or accords with ${pick.name} — a genuine wildcard. You rated it ${m.p.rating ?? '—'}★.`,
+      empty: 'Nothing distinct enough from this pick to count as a real wildcard right now.'
+    },
+  ];
+
+  return `<div class="layer-grid">${cards.map(c => `
+    <div class="layer-card">
+      <p class="layer-cat-label">${c.label}</p>
+      ${c.match ? `
+        <div class="layer-pair"><span>${c.match.p.name}</span></div>
+        <p class="layer-reasons-single">${c.reason(c.match)}</p>
+      ` : `<p class="layer-reasons-single layer-empty">${c.empty}</p>`}
+    </div>
+  `).join('')}</div>`;
+}
+
 function setupTodayPick(perfumes){
   const occSel = document.getElementById('tOccasion');
   [...new Set(perfumes.flatMap(p => p.occasion || []))].sort().forEach(o =>
@@ -674,9 +755,8 @@ function setupTodayPick(perfumes){
     const top = matches[0];
     const alternates = matches.slice(1, 3);
 
-    // See if a precomputed layering pair involves today's top pick.
-    const layering = computeLayeringSuggestions(perfumes)
-      .find(s => s.A.id === top.id || s.B.id === top.id);
+    // Categorized layering suggestions for today's pick.
+    const layerCategories = computeLayeringCategories(top, perfumes);
 
     const tierNote = {
       exact: '',
@@ -691,11 +771,6 @@ function setupTodayPick(perfumes){
         `<div class="match-row"><span>${p.name} (${p.brand})</span><span class="match-sim">${p.rating != null ? p.rating + '★' : ''}</span></div>`
       ).join('')}</div>` : '';
 
-    const layerHtml = layering ? `
-      <div class="gap-flag fills" style="margin-top:14px">
-        Feeling like layering? Try it with <strong>${layering.A.id === top.id ? layering.B.name : layering.A.name}</strong> — they share ${(layering.sharedBase.length ? layering.sharedBase : layering.sharedAny).slice(0,2).join(', ')}.
-      </div>` : '';
-
     document.getElementById('todayResult').innerHTML = `
       <div class="result-box">
         <p class="result-headline">${top.name}</p>
@@ -704,7 +779,8 @@ function setupTodayPick(perfumes){
         ${noteRow('Heart', top.notes?.mid, 'mid')}
         ${noteRow('Base', top.notes?.base, 'base')}
         ${noteRow('Notes', top.notes?.general, 'general')}
-        ${layerHtml}
+        <p class="result-sub" style="margin-top:16px">Layering ideas for today:</p>
+        ${layeringCategoryHtml(top, layerCategories)}
         ${altHtml}
       </div>
     `;

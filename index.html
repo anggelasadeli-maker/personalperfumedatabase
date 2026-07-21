@@ -144,11 +144,13 @@
   <section class="panel">
     <div class="panel-head">
       <h2>Collection Map</h2>
-      <p class="panel-sub">Every bottle plotted by accord family — closer points smell more alike. Default axes are auto-computed (PCA); pick specific families instead if you want a direct comparison.</p>
+      <p class="panel-sub">Every bottle plotted by accord family — closer points smell more alike. Default axes are auto-computed (PCA). Or set both ends of an axis yourself, e.g. Fresh ↔ Sweet, and leave the other end as "single family" for a plain presence axis.</p>
     </div>
     <div class="filters">
-      <select id="mapXAxis"><option value="pca">X: Auto (PCA)</option></select>
-      <select id="mapYAxis"><option value="pca">Y: Auto (PCA)</option></select>
+      <select id="mapX1"><option value="pca">X1: Auto (PCA)</option></select>
+      <select id="mapX2"><option value="none">X2: (single family)</option></select>
+      <select id="mapY1"><option value="pca">Y1: Auto (PCA)</option></select>
+      <select id="mapY2"><option value="none">Y2: (single family)</option></select>
     </div>
     <svg id="mapChart" viewBox="0 0 700 500"></svg>
   </section>

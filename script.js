@@ -322,7 +322,7 @@ function jitterFor(id, salt){
 
 function capitalize(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
 
-function renderCollectionMap(perfumes, xAxis='pca', yAxis='pca'){
+function renderCollectionMap(perfumes, x1='pca', x2='none', y1='pca', y2='none'){
   const svg = document.getElementById('mapChart');
   const { famLists, vocab } = buildAccordFeatures(perfumes);
 
@@ -332,14 +332,28 @@ function renderCollectionMap(perfumes, xAxis='pca', yAxis='pca'){
   }
 
   const pca = computePCAScores(perfumes, famLists, vocab);
-  const valuesFor = (axisKey, salt) => {
-    if (axisKey === 'pca') return salt === 'x' ? pca.xs : pca.ys;
-    return perfumes.map((p, i) => (famLists[i].includes(axisKey) ? 1 : 0) + jitterFor(p.id, axisKey + salt));
+  const presence = (famKey, i) => famLists[i].includes(famKey) ? 1 : 0;
+
+  // axis1='pca' -> use PCA scores (axis2 ignored).
+  // axis2 set -> bipolar spectrum: -1 (pure axis1) to +1 (pure axis2), 0 = neither/both.
+  // axis2='none' -> plain 0/1 presence of axis1.
+  const valuesFor = (axis1, axis2, salt) => {
+    if (axis1 === 'pca') return salt === 'x' ? pca.xs : pca.ys;
+    if (axis2 && axis2 !== 'none'){
+      return perfumes.map((p, i) => (presence(axis2, i) - presence(axis1, i)) + jitterFor(p.id, axis1 + axis2 + salt));
+    }
+    return perfumes.map((p, i) => presence(axis1, i) + jitterFor(p.id, axis1 + salt));
   };
-  const xs = valuesFor(xAxis, 'x');
-  const ys = valuesFor(yAxis, 'y');
-  const xLabel = xAxis === 'pca' ? pca.xLabel : `${capitalize(xAxis)} — has it (right) or not (left)`;
-  const yLabel = yAxis === 'pca' ? pca.yLabel : `${capitalize(yAxis)} — has it (top) or not (bottom)`;
+  const labelFor = (axis1, axis2, autoLabel) => {
+    if (axis1 === 'pca') return autoLabel;
+    if (axis2 && axis2 !== 'none') return `${capitalize(axis1)}  \u2194  ${capitalize(axis2)}`;
+    return `${capitalize(axis1)} — has it (right/top) or not (left/bottom)`;
+  };
+
+  const xs = valuesFor(x1, x2, 'x');
+  const ys = valuesFor(y1, y2, 'y');
+  const xLabel = labelFor(x1, x2, pca.xLabel);
+  const yLabel = labelFor(y1, y2, pca.yLabel);
 
   const width = 700, height = 500, pad = 70;
   const xMin = Math.min(...xs), xMax = Math.max(...xs);
@@ -373,14 +387,20 @@ function renderCollectionMap(perfumes, xAxis='pca', yAxis='pca'){
 
 function setupMapControls(perfumes){
   const { vocab } = buildAccordFeatures(perfumes);
-  const xSel = document.getElementById('mapXAxis');
-  const ySel = document.getElementById('mapYAxis');
+  const x1Sel = document.getElementById('mapX1');
+  const x2Sel = document.getElementById('mapX2');
+  const y1Sel = document.getElementById('mapY1');
+  const y2Sel = document.getElementById('mapY2');
+
   vocab.forEach(fam => {
-    xSel.insertAdjacentHTML('beforeend', `<option value="${fam}">X: ${capitalize(fam)}</option>`);
-    ySel.insertAdjacentHTML('beforeend', `<option value="${fam}">Y: ${capitalize(fam)}</option>`);
+    x1Sel.insertAdjacentHTML('beforeend', `<option value="${fam}">X1: ${capitalize(fam)}</option>`);
+    x2Sel.insertAdjacentHTML('beforeend', `<option value="${fam}">X2: ${capitalize(fam)}</option>`);
+    y1Sel.insertAdjacentHTML('beforeend', `<option value="${fam}">Y1: ${capitalize(fam)}</option>`);
+    y2Sel.insertAdjacentHTML('beforeend', `<option value="${fam}">Y2: ${capitalize(fam)}</option>`);
   });
-  [xSel, ySel].forEach(sel => sel.addEventListener('change', () =>
-    renderCollectionMap(perfumes, xSel.value, ySel.value)
+
+  [x1Sel, x2Sel, y1Sel, y2Sel].forEach(sel => sel.addEventListener('change', () =>
+    renderCollectionMap(perfumes, x1Sel.value, x2Sel.value, y1Sel.value, y2Sel.value)
   ));
 }
 
@@ -753,40 +773,61 @@ function setupTodayPick(perfumes){
       tier = 'none';
     }
     matches = matches.slice().sort((a,b) => (b.rating||0) - (a.rating||0));
-    const top = matches[0];
-    const alternates = matches.slice(1, 3);
-
-    // Categorized layering suggestions for today's pick.
-    const layerCategories = computeLayeringCategories(top, perfumes);
+    const top3 = matches.slice(0, 3);
 
     const tierNote = {
       exact: '',
       season: `No exact match for ${weather.split('/')[0]} + ${occasion || 'that occasion'} — widened to anything that fits the weather. This is a coverage gap worth knowing about.`,
       occasion: `Nothing tagged for that weather — matched on occasion only instead.`,
-      none: `Nothing tagged for that combo at all yet — showing your highest-rated bottle overall.`
+      none: `Nothing tagged for that combo at all yet — showing your highest-rated bottles overall.`
     }[tier];
 
-    const altHtml = alternates.length ? `
-      <p class="result-sub" style="margin-top:14px">Other options:</p>
-      <div class="match-list">${alternates.map(p =>
-        `<div class="match-row"><span>${p.name} (${p.brand})</span><span class="match-sim">${p.rating != null ? p.rating + '★' : ''}</span></div>`
-      ).join('')}</div>` : '';
+    const slides = top3.map((p, i) => {
+      const layering = computeLayeringCategories(p, perfumes);
+      return `
+        <div class="slide ${i === 0 ? 'active' : ''}" data-index="${i}">
+          <p class="result-headline">${p.name}</p>
+          <p class="result-sub">${p.brand} · ${p.rating != null ? p.rating + '★' : 'unrated'}${i === 0 && tierNote ? ' — ' + tierNote : ''}</p>
+          ${noteRow('Top', p.notes?.top, 'top')}
+          ${noteRow('Heart', p.notes?.mid, 'mid')}
+          ${noteRow('Base', p.notes?.base, 'base')}
+          ${noteRow('Notes', p.notes?.general, 'general')}
+          <p class="result-sub" style="margin-top:16px">Layering ideas:</p>
+          ${layeringCategoryHtml(p, layering)}
+        </div>
+      `;
+    }).join('');
+
+    const navHtml = top3.length > 1 ? `
+      <div class="slide-nav">
+        <button type="button" class="slide-btn" id="slidePrev">\u2190 Prev</button>
+        <span class="slide-indicator" id="slideIndicator">1 / ${top3.length}</span>
+        <button type="button" class="slide-btn" id="slideNext">Next \u2192</button>
+      </div>` : '';
 
     document.getElementById('todayResult').innerHTML = `
       <div class="result-box">
-        <p class="result-headline">${top.name}</p>
-        <p class="result-sub">${top.brand} · ${top.rating != null ? top.rating + '★' : 'unrated'}${tierNote ? ' — ' + tierNote : ''}</p>
-        ${noteRow('Top', top.notes?.top, 'top')}
-        ${noteRow('Heart', top.notes?.mid, 'mid')}
-        ${noteRow('Base', top.notes?.base, 'base')}
-        ${noteRow('Notes', top.notes?.general, 'general')}
-        <p class="result-sub" style="margin-top:16px">Layering ideas for today:</p>
-        ${layeringCategoryHtml(top, layerCategories)}
-        ${altHtml}
+        <div class="slideshow">${slides}</div>
+        ${navHtml}
       </div>
     `;
+
+    if (top3.length > 1){
+      let current = 0;
+      const container = document.getElementById('todayResult');
+      const slideEls = container.querySelectorAll('.slide');
+      const indicator = document.getElementById('slideIndicator');
+      const show = idx => {
+        current = (idx + top3.length) % top3.length;
+        slideEls.forEach((s, i) => s.classList.toggle('active', i === current));
+        indicator.textContent = `${current + 1} / ${top3.length}`;
+      };
+      document.getElementById('slidePrev').addEventListener('click', () => show(current - 1));
+      document.getElementById('slideNext').addEventListener('click', () => show(current + 1));
+    }
   });
 }
+
 
 /* ---------- Add a Bottle ---------- */
 function setupAddForm(perfumes){

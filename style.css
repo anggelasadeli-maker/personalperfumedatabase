@@ -83,6 +83,12 @@ body{
 /* ---------- Panels ---------- */
 main{max-width:1000px; margin:0 auto; padding:56px 24px 80px;}
 .panel{margin-bottom:64px;}
+.predictor-panel{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:32px;
+}
 .panel-head{margin-bottom:24px;}
 .panel-head-row{display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:16px;}
 .panel h2{

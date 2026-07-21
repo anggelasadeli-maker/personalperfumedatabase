@@ -3,7 +3,7 @@ const REBUY_COLORS = { "Yes": "#7C8B6F", "Maybe": "#C08A3E", "No": "#A85C6B" };
 
 // Paste your Apps Script Web App URL here after deploying (see README).
 // Leave as-is to keep using the static data.json file instead.
-const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxpYlA3puA2iQ-rsJavvYbivTx1dO8SgvtqXXE7dGOLMh-Ugvdda3cfR9-dDJwtJSo3-A/exec";
+const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbyAZQkmG7-x_j_e22okXFWmXq7EVddgEisfbW_3x3RNet1v_zKXPboF-2k3Il6XHAO_6w/exec";
 const WRITE_SECRET = "perfumesecret"; // must match SECRET in apps-script.gs
 
 const USING_LIVE_SHEET = SHEET_API_URL && !SHEET_API_URL.startsWith("PASTE_");
